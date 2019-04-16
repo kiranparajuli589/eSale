@@ -112,7 +112,7 @@
                                 <a href="{% url 'transaction_detail' trans.id %}">
                                     {% if trans.customer.get_customer_name %}
                                             {{ trans.customer.get_customer_name }}
-                                    {% else trans.vendor.get_vendor_name %}
+                                    {% elif trans.vendor.get_vendor_name %}
                                             {{ trans.vendor.get_vendor_name }}
 {#                                    {% else %}#}
 {#                                        <a href="{% url 'transaction_detail' trans.id %}">#}
