@@ -25,7 +25,7 @@
 
                         <div class="footer">
                             <div class="legend">
-                                <a class="btn btn-primary" href="/">Sale</a>
+                                <a class="btn btn-primary" href="{% url 'sale-item' item.pk %}">Sale</a>
                                 <a class="btn btn-info" href="{% url 'item-update' item.pk %}">Update</a>
                                 <a class="btn btn-danger" href="{% url 'item-delete' item.pk %}">Remove</a>
                             </div>

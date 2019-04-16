@@ -26,7 +26,7 @@ month = now.strftime("%B")
 @login_required
 def transaction_tab(request):
     transac = Transaction.objects.all().order_by('-timestamp')
-    return render(request, 'dashboard/transaction_tab.html',{'transacs': transac})
+    return render(request, 'dashboard/transaction_tab.html', {'transacs': transac})
 
 
 @login_required
@@ -151,6 +151,16 @@ def inventory(request):
 
     return render(request, 'dashboard/inventory.html', {'user': request.user,
                                                         'items': items,})
+
+
+@login_required()
+def sale(request, pk):
+    item = Item.objects.get(pk=pk)
+    cart = Cart(quantity=0)
+    cart.save()
+    cart.item.add(item)
+    order = Order.objects.create(cart=cart)
+    return redirect('cart-content', cart.id)
 
 
 @login_required
@@ -581,7 +591,7 @@ def pay_due_customer(request, pk):
             return redirect('customer-detail', customer.id)
         return redirect('customer-detail', customer.id)
 
-    return render(request, 'dashboard/pay_due.html')
+    return render(request, 'dashboard/pay_due.html', {'customer': customer})
 
 
 @login_required

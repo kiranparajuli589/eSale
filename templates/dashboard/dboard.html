@@ -99,25 +99,27 @@
                     {% for trans in transacs %}
                         <tr>
                             <td>
-                                <a href="{% url 'transaction_detail' trans.id %}">
+
                                 {% if trans.order.id %}
 
                                         {{ trans.order.id }}
 {#                                    </a>#}
                                 {% else %}
                                     0{{ trans.id }}0
-                                {% endif %}</a>
+                                {% endif %}
                             </td>
                             <td class="text-primary">
-                                {% if trans.customer.get_customer_name %}
-                                        {{ trans.customer.get_customer_name }}
-                                {% elif trans.vendor.get_vendor_name %}
-                                        {{ trans.vendor.get_vendor_name }}
-                                {% else %}
-                                    <a href="{% url 'transaction_detail' trans.id %}">
-                                        Others
-                                    </a>
-                                {% endif %}
+                                <a href="{% url 'transaction_detail' trans.id %}">
+                                    {% if trans.customer.get_customer_name %}
+                                            {{ trans.customer.get_customer_name }}
+                                    {% else trans.vendor.get_vendor_name %}
+                                            {{ trans.vendor.get_vendor_name }}
+{#                                    {% else %}#}
+{#                                        <a href="{% url 'transaction_detail' trans.id %}">#}
+{#                                            Others#}
+{#                                        </a>#}
+                                    {% endif %}
+                                </a>
                             </td>
                             <td>{{ trans.type }}</td>
                             <td>

@@ -4,7 +4,7 @@ from .views import (index, inventory,
                     cart_confirm, cart_content, order_transaction, transaction_detail,
                     customer_detail, add_customer, customer_update, customer_delete, customer_stat,
                     vendor_stat, vendor_detail, add_vendor, vendor_update, vendor_delete, transaction_tab,
-                    order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item)
+                    order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item, sale)
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('item/detail/<int:pk>/', item_detail, name='item-detail'),
     path('item/update/<int:pk>/', item_update, name='item-update'),
     path('item/delete/<int:pk>/', item_delete, name='item-delete'),
+    path('item/sale/<int:pk>/', sale, name='sale-item'),
     path('cart/content/<int:pk>/', cart_content, name='cart-content'),
     path('cart/confirm/<int:pk>/', cart_confirm, name='cart-confirm'),
     path('cart/confirm/item/add/<int:pk>/', cart_confirm_add_item, name='cart-confirm-add-item'),
