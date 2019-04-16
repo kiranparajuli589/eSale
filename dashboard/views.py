@@ -164,8 +164,11 @@ def cart_content(request, pk):
             i = 0
             for c_i in cart_item:
                 ca = CartItem(item=c_i, cart_id=cart.id)
-                if cart_qty[i] is '':
+                if cart_qty[i] is '' or int(cart_qty[i]) < 0:
                     ca.cart_qty += 0
+                # elif int(cart_qty[i]) > c_i.quantity:
+                #     messages.warning(request, str(c_i.item_name)+' : ITEM QUANTITY EXCEED!!\nAVAILABLE QUANTITY : '+str(c_i.quantity))
+                #     return redirect('cart-content', pk)
                 else:
                     ca.cart_qty = int(cart_qty[i])
                 i += 1
@@ -277,7 +280,6 @@ def cart_confirm_add_item(request, pk):  # TODO
                                                            'form': form,
                                                            'order': order,
                                                            'cart_items': cart_item})
-
 
 
 @login_required

@@ -52,6 +52,7 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         exclude = ['order', 'timestamp','due_amount','customer', 'vendor', 'type', 'payment_type', 'received']
 
+
 class CustomerAddForm(forms.ModelForm):
     class Meta:
         model = Customer
