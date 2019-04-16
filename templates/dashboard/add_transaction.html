@@ -1,0 +1,16 @@
+{% extends 'dashboard/inv.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h3 class="title">Add Transaction Detail</h3>
+    <hr style="height: 1px; background-color: #DDDDDD">
+    <form method="POST" enctype="multipart/form-data" class="col-md-4">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">Continue</button>
+        </div>
+    </form>
+{% endblock %}

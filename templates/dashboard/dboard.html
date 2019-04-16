@@ -1,0 +1,141 @@
+{% extends 'dashboard/dashboard.html' %}
+{% load static %}
+
+{% block script %}
+    <script>
+        function myFunction() {
+          // Declare variables
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <br>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card col-md-11 col-xs-offset-1" style="background-color: #46b8da">
+                <div class="header">
+                    <h4 class="text-center title" style="padding-top: 0px">{{ day }}</h4><hr>
+                </div>
+                <div class="content">
+                    <p>Total Received : {{ stat_day.tot_recvd }}</p>
+                    <p>Total Purchased : {{ stat_day.tot_payed }}</p>
+                    <p>Total Customer Due : {{ stat_day.tot_recv_due }}</p>
+                    <p>Total Purchase Due : {{ stat_day.tot_pay_due }}</p>
+                    <p>Total Items Sold : {{ stat_day.tot_items_sold }}</p>
+                    <p>Total Items Purchased : {{ stat_day.tot_items_purchased }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card col-md-11 col-lg-offset-1" style="background-color: #ce8483">
+                <div class="header">
+                    <h4 class="text-center title" style="padding-top: 0px">{{ month }}</h4><hr>
+                </div>
+                <div class="content">
+                    <p>Total Received : {{ stat_month.tot_recvd }}</p>
+                    <p>Total Purchased : {{ stat_month.tot_payed }}</p>
+                    <p>Total Customer Due : {{ stat_month.tot_recv_due }}</p>
+                    <p>Total Purchase Due : {{ stat_month.tot_pay_due }}</p>
+                    <p>Total Items Sold : {{ stat_month.tot_items_sold }}</p>
+                    <p>Total Items Purchased : {{ stat_month.tot_items_purchased }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card col-md-11 col-xs-offset-1" style="background-color: #46b8da">
+                <div class="header">
+                    <h4 class="text-center title" style="padding-top: 0px">{{ now.year }}</h4><hr>
+                </div>
+                <div class="content">
+                    <p>Total Received : {{ stat_year.tot_recvd }}</p>
+                    <p>Total Purchased : {{ stat_year.tot_payed }}</p>
+                    <p>Total Customer Due : {{ stat_year.tot_recv_due }}</p>
+                    <p>Total Purchase Due : {{ stat_year.tot_pay_due }}</p>
+                    <p>Total Items Sold : {{ stat_year.tot_items_sold }}</p>
+                    <p>Total Items Purchased : {{ stat_year.tot_items_purchased }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    {% include 'dashboard/search_bar.html' %}<br>
+    <form method="POST">
+        {% csrf_token %}
+        <h3 class="text-center">Latest Transactions</h3><br>
+        <div class="content table-responsive table-full-width">
+            <table class="table table-hover table-striped" id="myTable">
+                <thead style="background-color: #cbd5db">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Order ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Actor</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Type</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+{#                    <th>Buy Price</th>#}
+{#                    <th>Sale Price</th>#}
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Payment Amount</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Due</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">DateTime</td>
+
+                </thead>
+                <tbody>
+                    {% for trans in transacs %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'transaction_detail' trans.id %}">
+                                {% if trans.order.id %}
+
+                                        {{ trans.order.id }}
+{#                                    </a>#}
+                                {% else %}
+                                    0{{ trans.id }}0
+                                {% endif %}</a>
+                            </td>
+                            <td class="text-primary">
+                                {% if trans.customer.get_customer_name %}
+                                        {{ trans.customer.get_customer_name }}
+                                {% elif trans.vendor.get_vendor_name %}
+                                        {{ trans.vendor.get_vendor_name }}
+                                {% else %}
+                                    <a href="{% url 'transaction_detail' trans.id %}">
+                                        Others
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td>{{ trans.type }}</td>
+                            <td>
+                                {% if trans.order.cart.quantity %}
+                                    {{ trans.order.cart.quantity }}
+                                {% else %}
+                                    {{ 0 }}
+                                {% endif %}
+                            </td>
+{#                            <td>{{ trans.order.tot_buy_price }}</td>#}
+{#                            <td>{{ trans.order.tot_sale_price }}</td>#}
+                            <td>{{ trans.received }}</td>
+                            <td>{{ trans.due_amount }}</td>
+                            <td>{{ trans.timestamp|date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+{% endblock %}

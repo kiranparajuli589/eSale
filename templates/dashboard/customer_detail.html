@@ -1,0 +1,105 @@
+{% extends 'dashboard/cus.html' %}
+
+{% block content %}
+{#    <div class="col-xs-2"></div>#}
+{#    <div class="card col-md-7">#}
+{#        <div class="container">#}
+{#            #}
+{#            <div class="content">#}
+{#                #}
+{#            </div>#}
+{#            #}
+{#        </div>#}
+{#    </div>#}
+
+
+     <div class="row">
+            <div class="col-md-8 col-lg-offset-2">
+                <div class="card ">
+                    <div class="header">
+                        <div class="media-left">
+                            <img class="rounded-circle account-img" src="{{ customer.image.url }}" style="width:150px">
+                        </div>
+                        <div class="media-body">
+                            <h3 class="account-heading">{{ customer.get_customer_name }}</h3>
+                            <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.address }}</p>
+                            <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
+                            <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ customer.date_created }}</p>
+                        </div>
+                        <div class="media-bottom">
+                            <div class="legend">
+                                <a class="btn btn-info" href="{% url 'customer-update' customer.id %}">Update</a>
+						        <a class="btn btn-danger" href="{% url 'customer-delete' customer.id %}">Remove</a>
+                                <a class="btn btn-round btn-primary" href="{% url 'pay-due-customer' customer.id %}">PAY DUE</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <h4 class="text-center">TRANSACTION DETAILS</h4>
+                        <div class="content table-responsive table-full-width">
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Total</td>
+                                    <td>Items</td>
+                                    <td>Received</td>
+                                    <td>Due</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>{{ t_item }}</td>
+                                    <td>{{ customer.tot_recved }}</td>
+                                    <td>{{ customer.tot_due }}</td>
+                                </tr>
+                            </table>
+                        </div>
+						<div class="content table-responsive table-full-width">
+							<table class="table table-hover table-striped">
+								<thead style="background-color: #cbd5db">
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">TYPE</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">QUANTITY</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
+                                </thead>
+                                <tbody>
+                                    {% for transac in transacs %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'transaction_detail' transac.id %}">
+                                                {% if transac.order.id %}
+                                                        {{ transac.order.id }}
+{#                                                    </a>#}
+                                                {% else %}
+                                                   0 {{ transac.id }}0
+                                                {% endif %}</a>
+                                            </td>
+                                            <td>{{ transac.type }}</td>
+                                            <td>
+                                                {% if transac.order.cart.quantity %}
+                                                    {{ transac.order.cart.quantity }}
+                                                {% else %}
+                                                    {{ 0 }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ transac.received }}</td>
+                                            <td>{{ transac.due_amount }}</td>
+                                            <td>{{ transac.timestamp|date }}</td>
+                                        </tr>
+                                    {% endfor %}
+								</tbody>
+							</table>
+						</div>
+                        <div class="footer">
+                            <hr>
+                            <div class="stats">
+                                <i class="fa fa-check"></i> Data information certified
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     </div>
+
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'dashboard/inv.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h3 class="title">Add Transaction Detail</h3>
+    <hr style="height: 1px; background-color: #DDDDDD">
+    <form method="POST" enctype="multipart/form-data" class="col-md-4">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            {% if transac.type == 'SALE' %}
+                <label>Customer:</label>
+                {{ form.customer }}
+            {% else %}
+                <label>Vendor:</label>
+                {{ form.vendor }}
+            {% endif %}
+        <br><br>
+            <div class="row">
+                <label class="col-md-12">
+                    <input type="number" max="{{ transac.order.grand_total }}" min="{{ 0 }}"
+                           name="received" class="form-control">
+                    Payment Amount
+                </label>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-info" type="submit">Add</button>
+        </div>
+    </form>
+{% endblock %}

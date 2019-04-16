@@ -1,0 +1,94 @@
+{% extends 'dashboard/ven.html' %}
+
+{% block content %}
+     <div class="row">
+            <div class="col-md-8 col-lg-offset-2">
+                <div class="card ">
+                    <div class="header">
+                        <div class="media-left">
+                            <img class="rounded-circle account-img" src="{{ vendor.image.url }}" style="width:150px">
+                        </div>
+                        <div class="media-body">
+                            <h3 class="account-heading">{{ vendor.get_vendor_name }}</h3>
+                            <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;  {{ vendor.address }}</p>
+                            <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ vendor.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
+                            <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ vendor.date_created }}</p>
+                        </div>
+                        <div class="media-bottom">
+                            <div class="legend">
+                                <a class="btn btn-info" href="{% url 'vendor-update' vendor.id %}">Update</a>
+						        <a class="btn btn-danger" href="{% url 'vendor-delete' vendor.id %}">Remove</a>
+                                <a class="btn btn-round btn-primary" href="{% url 'pay-due-vendor' vendor.id %}">PAY DUE</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <h4 class="text-center">TRANSACTION DETAILS</h4>
+						<div class="content table-responsive table-full-width">
+                        <div class="content table-responsive table-full-width">
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Total</td>
+                                    <td>Items</td>
+                                    <td>Received</td>
+                                    <td class="text-center">Due</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>{{ t_item }}</td>
+                                    <td>{{ vendor.tot_recved }}</td>
+                                    <td class="text-center">{{ vendor.tot_due }}</td>
+                                </tr>
+                            </table>
+                        </div>
+							<table class="table table-hover table-striped">
+								<thead style="background-color: #cbd5db">
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">TYPE</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">QUANTITY</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
+                                </thead>
+                                <tbody>
+                                    {% for transac in transacs %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'transaction_detail' transac.id %}">
+                                                {% if transac.order.id %}
+                                                    <a href="{% url 'transaction_detail' transac.id %}">
+                                                        {{ transac.order.id }}
+{#                                                    </a>#}
+                                                {% else %}
+                                                    0{{ transac.id }}0
+                                                {% endif %}</a>
+                                            </td>
+                                            <td>{{ transac.type }}</td>
+                                            <td>
+                                                {% if transac.order.cart.quantity %}
+                                                    {{ transac.order.cart.quantity }}
+                                                {% else %}
+                                                    {{ 0 }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ transac.received }}</td>
+                                            <td>{{ transac.due_amount }}</td>
+                                            <td>{{ transac.timestamp|date }}</td>
+                                        </tr>
+                                    {% endfor %}
+								</tbody>
+							</table>
+						</div>
+                        <div class="footer">
+                            <hr>
+                            <div class="stats">
+                                <i class="fa fa-check"></i> Data information certified
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     </div>
+
+
+{% endblock %}

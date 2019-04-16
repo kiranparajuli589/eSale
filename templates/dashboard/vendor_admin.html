@@ -1,0 +1,67 @@
+{% extends 'dashboard/ven.html' %}
+{% load static %}
+
+{% block script %}
+    <script>
+        function myFunction() {
+          // Declare variables
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    {% include "dashboard/search_bar.html" %}
+    <br><hr>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-8"><h2>Vendor Panel</h2></div>
+            <div class="col-sm-2 col-lg-offset-1"  style="padding-top: 25px; padding-left: 140px">
+                <a href="{% url 'add-vendor' %}" class="btn btn-danger"><i class="pe-7s-plus text-primary"></i> Add Vendor</a>
+            </div>
+        </div>
+        <div class="content table-responsive">
+            <table class="table table-hover table-striped" id="myTable">
+                <thead style="background-color: #cbd5db">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Vendor</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Email</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Address</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Phone</td>
+{#                    <td style="font-family: 'Noto Sans CJK SC Bold'"></td>#}
+                </thead>
+                <tbody>
+                    {% for vendor in vendors %}
+                        <tr>
+                            <td>{{ vendor.id }}</td>
+                            <td>
+                                <a href="{% url 'vendor-detail' vendor.id %}">
+                                    {{ vendor.get_vendor_name }}
+                                </a>
+                            </td>
+                            <td>{{ vendor.email }}</td>
+                            <td>{{ vendor.address }}</td>
+                            <td>{{ vendor.phone }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+{% endblock %}

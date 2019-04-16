@@ -1,0 +1,36 @@
+from django.urls import path, include
+from .views import (index, inventory,
+                    item_detail, item_update, item_delete, add_item,
+                    cart_confirm, cart_content, order_transaction, transaction_detail,
+                    customer_detail, add_customer, customer_update, customer_delete, customer_stat,
+                    vendor_stat, vendor_detail, add_vendor, vendor_update, vendor_delete, transaction_tab,
+                    order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item)
+
+
+urlpatterns = [
+    path('db/stat/', index, name='dashboard'),
+    path('', inventory, name='inventory'),
+    path('item/add/', add_item, name='add-item'),
+    path('item/detail/<int:pk>/', item_detail, name='item-detail'),
+    path('item/update/<int:pk>/', item_update, name='item-update'),
+    path('item/delete/<int:pk>/', item_delete, name='item-delete'),
+    path('cart/content/<int:pk>/', cart_content, name='cart-content'),
+    path('cart/confirm/<int:pk>/', cart_confirm, name='cart-confirm'),
+    path('cart/confirm/item/add/<int:pk>/', cart_confirm_add_item, name='cart-confirm-add-item'),
+    path('transaction/<int:pk>/', order_transaction, name='order-transaction'),
+    path('transaction/step2/<int:pk>', order_transaction_two, name='order-transaction-2'),
+    path('transaction/detail/<int:pk>/', transaction_detail, name='transaction_detail'),
+    path('customer/', customer_stat, name='customer'),
+    path('customer/detail/<int:pk>/', customer_detail, name='customer-detail'),
+    path('customer/add', add_customer, name='add-customer'),
+    path('customer/update/<int:pk>/', customer_update, name='customer-update'),
+    path('customer/delete/<int:pk>/', customer_delete, name='customer-delete'),
+    path('vendor/', vendor_stat, name='vendor'),
+    path('vendor/detail/<int:pk>/', vendor_detail, name='vendor-detail'),
+    path('vendor/add', add_vendor, name='add-vendor'),
+    path('vendor/update/<int:pk>/', vendor_update, name='vendor-update'),
+    path('vendor/delete/<int:pk>/', vendor_delete, name='vendor-delete'),
+    path('transaction/', transaction_tab, name='transaction-tab'),
+    path('pay/due/customer/<int:pk>/', pay_due_customer, name='pay-due-customer'),
+    path('pay/due/vendor/<int:pk>/', pay_due_vendor, name='pay-due-vendor'),
+]

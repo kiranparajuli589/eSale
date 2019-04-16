@@ -1,0 +1,43 @@
+{% extends 'dashboard/inv.html' %}
+
+{% block content %}
+     <div class="row">
+            <div class="col-md-7 col-lg-offset-2">
+                <div class="card ">
+                    <div class="header">
+                        <h3 class="title"><b>{{ item.item_name }}</b></h3>
+                        <p class="category">{{ item.description }}</p>
+                    </div>
+                    <div class="content">
+                        <div class="media">
+                            <div class="media-left">
+                                <img class="rounded mx-auto d-block" src="{{ item.item_image.url }}" style="
+                                width:300px; height:280px;">
+                            </div>
+                            <div class="media-body">
+                                <p class="text-secondary">Recent Vendor : <b>{{ purchase.vendor.get_vendor_name }}</b></p><hr>
+                                <h5 class="text-justify">Available Quantity : <b>{{ item.quantity }}</b></h5><hr>
+                                <p class="text-secondary">Location : {{ item.location_in_store }}</p><hr>
+                                <p class="text-secondary">Purchase Rate : {{ item.buying_rate }}</p><hr>
+                                <p class="text-secondary">Sale Rate : {{ item.selling_rate }}</p>
+                            </div>
+                        </div>
+
+                        <div class="footer">
+                            <div class="legend">
+                                <a class="btn btn-primary" href="/">Sale</a>
+                                <a class="btn btn-info" href="{% url 'item-update' item.pk %}">Update</a>
+                                <a class="btn btn-danger" href="{% url 'item-delete' item.pk %}">Remove</a>
+                            </div>
+                            <hr>
+                            <div class="stats">
+                                <i class="fa fa-check"></i> Data information certified
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     </div>
+
+
+{% endblock %}

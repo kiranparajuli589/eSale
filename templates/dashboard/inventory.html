@@ -1,0 +1,79 @@
+{% extends 'dashboard/inv.html' %}
+{% load static %}
+
+{% block script %}
+    <script>
+        function myFunction() {
+          // Declare variables
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-1">
+            <a href="{% url 'add-item' %}" class="btn btn-default btn-fill"><i class="pe-7s-plus text-primary"></i> Add Item</a>
+        </div>
+        <div class="col-md-10">
+            {% include 'dashboard/search_bar.html' %}
+        </div>
+    </div>
+    <br><hr>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-10"><h2>Store</h2></div>
+            <div class="col-sm-2" style="padding-top: 25px">
+                <button type="submit" class="btn btn-primary"><i class="pe-7s-cart"></i> To Cart</button>
+            </div>
+        </div>
+    <br>
+        <div class="content table-responsive table-full-width">
+            <table class="table table-striped" id="myTable">
+                <thead style="background-color: #cbd5db">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Purchase Rate</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                    <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.item_code}}</td>
+                            <td>
+                                <a id="item{{ forloop.counter }}" href="{% url 'item-detail' item.pk %}">
+                                    {{ item.item_name }}
+                                </a></td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.buying_rate }}</td>
+                            <td>{{ item.selling_rate }}</td>
+                            <td class="text-center">
+                                <input value="{{ item.id }}" name="ItemPK" type="checkbox" >
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+{% endblock %}

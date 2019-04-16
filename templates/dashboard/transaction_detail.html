@@ -1,0 +1,61 @@
+{% extends 'dashboard/tran.html' %}
+
+{% block content %}
+             <div class="row">
+                    <div class="col-md-8 col-lg-offset-2">
+                        <div class="card ">
+                            <div class="header">
+                                <h3 class="title">Transaction Detail</h3>
+                                <hr>
+                                {% if transac.customer.get_customer_name %}
+                                    <h4 class="simple-text">Customer Name : {{ transac.customer.get_customer_name }}</h4>
+                                {% elif not transac.customer %}
+                                    <h4 class="simple-text">VENDOR NAME : {{ transac.vendor.get_vendor_name }}</h4>
+                                {% else %}
+                                    <h4 class="simple-text">ACTOR: NONE</h4>
+                                {% endif %}
+                            </div>
+                            <div class="content" style="font-size: 16px">
+                                <div class="row">
+                                    <div class="col-md-5">Date : {{ transac.timestamp }}</div>
+                                    <div class="col-md-4">Received : {{ transac.received }}</div>
+                                    <div class="col-md-3">Due : {{ transac.due_amount }}</div>
+                                </div><br>
+                                <div class="col-md-12 text-center text-danger">Transaction Type: {{ transac.type }}</div>
+                            <hr>
+                                {% if not transac.type == 'PAYDUE' %}
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-offset-2 content table-responsive">
+                                            <table class="table table-hover">
+                                                <thead style="background-color: #cbd5db">
+                                                    <th>Item ID</th>
+                                                    <th>Item</th>
+                                                    <th class="text-center">Quantity</th>
+                                                </thead>
+                                                <tbody>
+                                                    {% for item in cart_item %}
+                                                        <tr>
+                                                            <td>{{ item.item.item_code }}</td>
+                                                            <td>{{ item.item.item_name }}</td>
+                                                            <td class="text-center">{{ item.cart_qty }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="footer">
+                                    <div class="legend">
+                                        <i class="fa fa-circle text-info"></i> Update
+                                        <i class="fa fa-circle text-danger"></i> Remove
+                                    </div>
+                                    <hr>
+                                    <div class="stats">
+                                        <i class="fa fa-check"></i> Data information certified
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+{% endblock %}
