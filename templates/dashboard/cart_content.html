@@ -1,4 +1,5 @@
 {% extends 'dashboard/inv.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="col-md-12">
@@ -30,8 +31,9 @@
                                     <td class="text-center">{{ sel.quantity }}</td>
                                     <td class="text-center">
                                         <div class="form-group">
-                                            <div class="col-md-7 col-lg-offset-3">
-                                                <input type="number" name= "cart_qty" max="{{ sel.quantity }}" min="{{ 1 }}">
+                                            <div class="col-md-7 col-sm-offset-3">
+                                                <input type="number" name= "cart_qty" max="{{ sel.quantity }}"
+                                                       min="{{ 1 }}" style="width: 9em">
                                             </div>
                                         </div>
                                     </td>

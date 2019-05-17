@@ -42,35 +42,6 @@
                         </tbody>
                     </table>
                 </div>
-        {% if form %}
-                <div class="row">
-                    <form class="form-inline" role="form" method="POST">
-                        {% csrf_token %}
-                        <hr style="height: 1px; background-color: #dddddd">
-                        <div class="col-md-3 col-lg-offset-1" style="padding-left: 50px">
-                            <h2 style="padding-top: 25px"><i class="pe-7s-gift"></i> Discount:</h2>
-                        </div>
-                        <div class="col-md-5 card text-right" style="background-color: #2009c11f">
-{#                            <div class="input-group">#}
-                                <label for="{{ form.disc_per.id_for_label }}" style="font-size: 16px; padding-top: 20px; padding-right: 15px">DISCOUNT PERCENTAGE(%)</label>
-
-{#                                <span class="input-group-addon" style="background-color: #a9bdfc; border-color: #a9bdfc; height: 40px; padding: 0px; box-sizing: border-box">PERCENTAGE %</span>#}
-                                <input class="form-control" type="number" placeholder="%%%"
-                                       name="disc_per" step="0.01" id="id_disc_per" autocomplete="off" min="0" max="100">
-{#                            </div>#}
-{#                            <div class="input-group">#}
-                                <label for="{{ form.disc_amt.id_for_label }}" style="font-size: 16px; padding-top: 20px; padding-right: 10px">DISCOUNT AMOUNT </label>
-{#                                <span class="input-group-addon" style="background-color: #a9bdfc; border-color: #a9bdfc;">#}
-{#                                    AMOUNT</span>#}
-                                <input type="number" name="disc_amt" step="0.01" id="id_disc_amt" class="form-control"
-                                       placeholder="Amount" min="0" max="{{ order.tot_sale_price }}">
-{#                            </div>#}
-                            <br><br>
-                            <button class="btn btn-primary text-right" type="submit">Add Discount</button>
-                        </div>
-                    </form>
-                </div>
-        {% endif %}
                 <hr  style="height: 1px; background-color: #dddddd" class="row">
                 <div class="table-responsive table-full-width text-right">
                     <table class="table table-striped table-condensed">
@@ -91,8 +62,8 @@
             <div class="footer">
                 {# # TODO place modal close button #}
                 <div class="legend">
-                    <a href="{% url 'order-transaction' order.id %}" class="btn btn-primary">Continue</a>
-                    <a href="{% url 'cart-content' carts.id %}" class="btn btn-warning">Return</a>
+                    <a href="{% url 'order-transaction-purchase' order.id %}" class="btn btn-primary">Continue</a>
+                    <a href="{% url 'cart-confirm-add-item' carts.id %}" class="btn btn-warning">Return</a>
                 </div>
             </div>
         </div>

@@ -23,7 +23,10 @@
     <link href="{% static 'css/animate.min.css' %}" rel="stylesheet"/>
 
     <!--  Light Bootstrap Table core CSS    -->
+
     <link href="{% static 'css/light-bootstrap-dashboard.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/checkbox.css' %}" rel="stylesheet"/>
+
 
 
     <!--  CSS for Demo Purpose, don't include it in your project     -->
@@ -50,7 +53,7 @@
 
     	<div class="sidebar-wrapper">
             <div class="logo">
-                <a href="#" class="simple-text">
+                <a href="{% url 'inventory' %}" class="simple-text">
                     eSale
                 </a>
             </div>
@@ -90,6 +93,12 @@
                     <a href="{% url 'transaction-tab' %}">
                         <i class="pe-7s-cash"></i>
                         <p>Transactions</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'add-item' %}">
+                        <i class="pe-7s-plus"></i>
+                        <p>Add Item</p>
                     </a>
                 </li>
             </ul>

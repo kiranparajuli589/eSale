@@ -13,22 +13,32 @@
                             <div class="media-left">
                                 <img class="rounded mx-auto d-block" src="{{ item.item_image.url }}" style="
                                 width:300px; height:280px;">
+                                <br><br><br><br><br>
+
+                                <a class="btn btn-primary" href="{% url 'sale-item' item.pk %}">Sale</a>
+                                <a class="btn btn-info" href="{% url 'item-update' item.pk %}">Update</a>
+                                <a class="btn btn-danger" href="{% url 'item-delete' item.pk %}">Remove</a>
                             </div>
                             <div class="media-body">
                                 <p class="text-secondary">Recent Vendor : <b>{{ purchase.vendor.get_vendor_name }}</b></p><hr>
                                 <h5 class="text-justify">Available Quantity : <b>{{ item.quantity }}</b></h5><hr>
                                 <p class="text-secondary">Location : {{ item.location_in_store }}</p><hr>
                                 <p class="text-secondary">Purchase Rate : {{ item.buying_rate }}</p><hr>
-                                <p class="text-secondary">Sale Rate : {{ item.selling_rate }}</p>
+                                <p class="text-secondary">Previous Purchase Rate : {{ item.buying_rate_prev }}</p><hr>
+                                <p class="text-secondary">Sale Rate : {{ item.selling_rate }}</p><hr>
+                                <p class="text-secondary">Previous Sale Rate : {{ item.selling_rate_prev }}</p>
+                            </div>
+                            <div class="media-left">
+
                             </div>
                         </div>
 
                         <div class="footer">
-                            <div class="legend">
-                                <a class="btn btn-primary" href="{% url 'sale-item' item.pk %}">Sale</a>
-                                <a class="btn btn-info" href="{% url 'item-update' item.pk %}">Update</a>
-                                <a class="btn btn-danger" href="{% url 'item-delete' item.pk %}">Remove</a>
-                            </div>
+{#                            <div class="legend">#}
+{#                                <a class="btn btn-primary" href="{% url 'sale-item' item.pk %}">Sale</a>#}
+{#                                <a class="btn btn-info" href="{% url 'item-update' item.pk %}">Update</a>#}
+{#                                <a class="btn btn-danger" href="{% url 'item-delete' item.pk %}">Remove</a>#}
+{#                            </div>#}
                             <hr>
                             <div class="stats">
                                 <i class="fa fa-check"></i> Data information certified

@@ -1,18 +1,32 @@
 {% extends 'dashboard/cus.html' %}
 
+{% block script %}
+    <script>
+        function myFunction() {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block content %}
-{#    <div class="col-xs-2"></div>#}
-{#    <div class="card col-md-7">#}
-{#        <div class="container">#}
-{#            #}
-{#            <div class="content">#}
-{#                #}
-{#            </div>#}
-{#            #}
-{#        </div>#}
-{#    </div>#}
-
-
      <div class="row">
             <div class="col-md-8 col-lg-offset-2">
                 <div class="card ">
@@ -28,9 +42,15 @@
                         </div>
                         <div class="media-bottom">
                             <div class="legend">
+                                <br>
                                 <a class="btn btn-info" href="{% url 'customer-update' customer.id %}">Update</a>
 						        <a class="btn btn-danger" href="{% url 'customer-delete' customer.id %}">Remove</a>
-                                <a class="btn btn-round btn-primary" href="{% url 'pay-due-customer' customer.id %}">PAY DUE</a>
+                                <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-customer' customer.id %}">PAY DUE</a>
+                                <a class="btn btn-lg btn-primary pull-right"
+                                   style="margin-top: -20px;"
+                                   href="{% url 'start-sale' customer.id %}">
+                                    START SALE
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -48,48 +68,48 @@
                                     <td></td>
                                     <td>{{ t_item }}</td>
                                     <td>{{ customer.tot_recved }}</td>
-                                    <td>{{ customer.tot_due }}</td>
+                                    <td id="TDUE">{{ customer.tot_due }}</td>
                                 </tr>
                             </table>
                         </div>
-						<div class="content table-responsive table-full-width">
-							<table class="table table-hover table-striped">
-								<thead style="background-color: #cbd5db">
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">TYPE</td>
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">QUANTITY</td>
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
-                                    <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
+                        <div class="content table-responsive table-full-width">
+                            <table class="table table-hover table-striped">
+                                <thead style="background-color: #cbd5db">
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">TYPE</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">QUANTITY</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
                                 </thead>
                                 <tbody>
-                                    {% for transac in transacs %}
-                                        <tr>
-                                            <td>
-                                                <a href="{% url 'transaction_detail' transac.id %}">
+                                {% for transac in transacs %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'transaction_detail' transac.id %}">
                                                 {% if transac.order.id %}
-                                                        {{ transac.order.id }}
-{#                                                    </a>#}
+                                                    {{ transac.order.id }}
+                                                    {#                                                    </a>#}
                                                 {% else %}
-                                                   0 {{ transac.id }}0
+                                                    0 {{ transac.id }}
                                                 {% endif %}</a>
-                                            </td>
-                                            <td>{{ transac.type }}</td>
-                                            <td>
-                                                {% if transac.order.cart.quantity %}
-                                                    {{ transac.order.cart.quantity }}
-                                                {% else %}
-                                                    {{ 0 }}
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ transac.received }}</td>
-                                            <td>{{ transac.due_amount }}</td>
-                                            <td>{{ transac.timestamp|date }}</td>
-                                        </tr>
-                                    {% endfor %}
-								</tbody>
-							</table>
-						</div>
+                                        </td>
+                                        <td>{{ transac.type }}</td>
+                                        <td>
+                                            {% if transac.order.cart.quantity %}
+                                                {{ transac.order.cart.quantity }}
+                                            {% else %}
+                                                {{ 0 }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ transac.received }}</td>
+                                        <td>{{ transac.due_amount }}</td>
+                                        <td>{{ transac.timestamp|date }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="footer">
                             <hr>
                             <div class="stats">
@@ -100,6 +120,11 @@
                 </div>
             </div>
      </div>
-
-
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        let a = document.getElementById('TDUE').innerHTML
+        if (a <= 0){
+            document.getElementById('DUE').style.display = 'none'
+        }
+    </script>
 {% endblock %}

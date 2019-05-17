@@ -15,10 +15,16 @@
                             <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ vendor.date_created }}</p>
                         </div>
                         <div class="media-bottom">
+                            <br>
                             <div class="legend">
                                 <a class="btn btn-info" href="{% url 'vendor-update' vendor.id %}">Update</a>
 						        <a class="btn btn-danger" href="{% url 'vendor-delete' vendor.id %}">Remove</a>
-                                <a class="btn btn-round btn-primary" href="{% url 'pay-due-vendor' vendor.id %}">PAY DUE</a>
+                                <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-vendor' vendor.id %}">PAY DUE</a>
+                                <a class="btn btn-lg btn-primary pull-right"
+                                   style="margin-top: -20px;"
+                                   href="{% url 'start-purchase' vendor.id %}">
+                                    START PURCHASE
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -37,7 +43,7 @@
                                     <td></td>
                                     <td>{{ t_item }}</td>
                                     <td>{{ vendor.tot_recved }}</td>
-                                    <td class="text-center">{{ vendor.tot_due }}</td>
+                                    <td id="TDUE" class="text-center">{{ vendor.tot_due }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -56,11 +62,9 @@
                                             <td>
                                                 <a href="{% url 'transaction_detail' transac.id %}">
                                                 {% if transac.order.id %}
-                                                    <a href="{% url 'transaction_detail' transac.id %}">
-                                                        {{ transac.order.id }}
-{#                                                    </a>#}
+                                                    {{ transac.order.id }}
                                                 {% else %}
-                                                    0{{ transac.id }}0
+                                                    0{{ transac.id }}
                                                 {% endif %}</a>
                                             </td>
                                             <td>{{ transac.type }}</td>
@@ -89,6 +93,11 @@
                 </div>
             </div>
      </div>
-
-
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        let a = document.getElementById('TDUE').innerHTML
+        if (a <= 0){
+            document.getElementById('DUE').style.display = 'none'
+        }
+    </script>
 {% endblock %}

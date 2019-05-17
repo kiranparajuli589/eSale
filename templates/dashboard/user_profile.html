@@ -50,7 +50,7 @@
 
     	<div class="sidebar-wrapper">
             <div class="logo">
-                <a href="#" class="simple-text">
+                <a href="{% url 'inventory' %}" class="simple-text">
                     eSale
                 </a>
             </div>
@@ -90,6 +90,12 @@
                     <a href="{% url 'transaction-tab' %}">
                         <i class="pe-7s-cash"></i>
                         <p>Transactions</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'add-item' %}">
+                        <i class="pe-7s-plus"></i>
+                        <p>Add Item</p>
                     </a>
                 </li>
             </ul>

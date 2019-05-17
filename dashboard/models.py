@@ -9,8 +9,7 @@ now = ktm.localize(datetime.now())
 
 payment_type = (
     ('CASH', 'Cash'),
-    ('CREDIT', 'Credit'),
-    ('CHEQUE', 'Cheque'),
+    ('CREDIT', 'Credit')
 )
 trans_type = (
     ('PURCHASE', 'PURCHASE'),
@@ -23,7 +22,9 @@ class Item(models.Model):
     item_code = models.CharField(max_length=7, unique=True)
     item_name = models.CharField(max_length=255, unique=True)
     buying_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    buying_rate_prev = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     selling_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    selling_rate_prev = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     item_image = models.ImageField(default='default_item.jpeg', upload_to='item_images')
     minimum_stock = models.IntegerField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -136,6 +137,8 @@ class Cart(models.Model):
 
 class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True)
     # total_qty = models.IntegerField(default=0)
     tot_buy_price = models.DecimalField(default=0, decimal_places=2, max_digits=8)
     tot_sale_price = models.DecimalField(default=0, decimal_places=2, max_digits=8)
@@ -160,7 +163,7 @@ class Transaction(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True, blank=True, unique=False)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     timestamp = models.DateTimeField(default=now)
-    received = models.DecimalField(max_digits=8, decimal_places=2, default=0)  # received from customer or payed to vendor
+    received = models.DecimalField(max_digits=8, decimal_places=2, default=0, blank=True)  # received from customer or payed to vendor
     due_amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     payment_type = models.CharField(max_length=6, choices=payment_type, default='CASH')
     type = models.CharField(max_length=10, choices=trans_type, default='SALE')

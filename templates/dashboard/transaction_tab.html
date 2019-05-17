@@ -34,9 +34,8 @@
         {% csrf_token %}
         <h3 class="text-center">Transactions Log</h3><br>
         <div class="content table-responsive table-full-width">
-            <table class="table table-hover table-striped" id="myTable">
-                <thead style="background-color: #cbd5db">
-                    <td style="font-family: 'Noto Sans CJK SC Bold'">Order ID</td>
+            <table class="table" id="myTable">
+                <thead style="background-color: #6396e8; color: whitesmoke;">                    <td style="font-family: 'Noto Sans CJK SC Bold'">Order ID</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Actor</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Type</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
@@ -48,6 +47,13 @@
 
                 </thead>
                 <tbody>
+                    <style>
+                        .odd {
+                            background-color: #cdddf7; }
+
+                        .odd td {
+                            border-bottom: 1px solid #cef; }
+                    </style>
                     {% for trans in transacs %}
                         <tr>
                             <td>
@@ -56,7 +62,7 @@
                                         {{ trans.order.id }}
 {#                                    </a>#}
                                 {% else %}
-                                    0{{ trans.id }}0
+                                    0{{ trans.id }}
                                 {% endif %}
                             </td>
                             <td class="text-primary">
@@ -91,4 +97,10 @@
             </table>
         </div>
     </form>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("tr:odd").addClass("odd");
+        });
+    </script>
 {% endblock %}

@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5xdpy^0=)pi*q3iqy_22$_1z5wu0ug)0ai3kuj^48l-fm9#&oc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 AUTH_USER_MODEL = 'accounts.User'

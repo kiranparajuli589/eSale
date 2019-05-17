@@ -52,7 +52,7 @@ class TransactionStatMonthAdmin(admin.ModelAdmin):
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Vendor, VendorAdmin)
 admin.site.register(Customer, CustomerAdmin)
-# admin.site.register(Cart)
+admin.site.register(Cart)
 # admin.site.register(Order)
 admin.site.register(Transaction, TransactionAdmin)
 # admin.site.register(CartItem)

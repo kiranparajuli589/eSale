@@ -7,24 +7,38 @@
     <form method="POST" enctype="multipart/form-data" class="col-md-4">
         {% csrf_token %}
         <fieldset class="form-group">
-            {% if transac.type == 'SALE' %}
-                <label>Customer:</label>
-                {{ form.customer }}
-            {% else %}
-                <label>Vendor:</label>
-                {{ form.vendor }}
+             <style>
+                    select {width: 13em; height: 2.5em}
+             </style>
+            <label style="padding-right: 43px">Payment Type</label>
+            {{ form.payment_type }}
+        </fieldset>
+        <fieldset class="form-group">
+            {% if not order.vendor %}
+                <label style="padding-right: 86px"> Vendor </label>
+                 {{ form.vendor }}
             {% endif %}
-        <br><br>
-            <div class="row">
-                <label class="col-md-12">
-                    <input type="number" max="{{ transac.order.grand_total }}" min="{{ 0 }}"
-                           name="received" class="form-control">
-                    Payment Amount
-                </label>
+            <br><br>
+            <div class="row" id="pamt">
+                <label class="col-md-5">Payment Amt</label>
+                <input class="col-md-12" type="number" max="{{ order.grand_total }}" min="{{ 0 }}"
+                       name="received" class="form-control" style="width: 13.1em; height: 33px;">
             </div>
         </fieldset>
         <div class="form-group">
             <button class="btn btn-info" type="submit">Add</button>
         </div>
     </form>
+
+    <script>
+        let e = document.getElementById("id_payment_type");
+        e.onchange = function(){
+            let p_type = e.options[e.selectedIndex].value;
+            if( p_type == 'CREDIT')
+                document.getElementById('pamt').style.display = 'none';
+            else{
+                document.getElementById('pamt').style.display = 'block';
+            }
+        };
+    </script>
 {% endblock %}

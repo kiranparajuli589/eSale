@@ -28,13 +28,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-1">
-            <a href="{% url 'add-item' %}" class="btn btn-default btn-fill"><i class="pe-7s-plus text-primary"></i> Add Item</a>
-        </div>
-        <div class="col-md-10">
-            {% include 'dashboard/search_bar.html' %}
-        </div>
+    <div class="text-center">
+        {% include 'dashboard/search_bar.html' %}
     </div>
     <br><hr>
     <form method="POST">
@@ -47,8 +42,8 @@
         </div>
     <br>
         <div class="content table-responsive table-full-width">
-            <table class="table table-striped" id="myTable">
-                <thead style="background-color: #cbd5db">
+            <table class="table" id="myTable">
+                <thead style="background-color: #6396e8; color: whitesmoke;">
                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
@@ -57,18 +52,38 @@
                     <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
                 </thead>
                 <tbody>
+                    <style>
+                        .odd {
+                            background-color: #cdddf7; }
+
+                        .odd td {
+                            border-bottom: 1px solid #cef; }
+                    </style>
                     {% for item in items %}
+
                         <tr>
                             <td>{{ item.item_code}}</td>
                             <td>
                                 <a id="item{{ forloop.counter }}" href="{% url 'item-detail' item.pk %}">
                                     {{ item.item_name }}
                                 </a></td>
-                            <td>{{ item.quantity }}</td>
+                            {% if item.quantity < item.minimum_stock %}
+                                <td class="text-danger">
+                                    {{ item.quantity }}
+                                </td>
+                                {% else %}
+                                <td>
+                                    {{ item.quantity }}
+                                </td>
+                            {% endif %}
                             <td>{{ item.buying_rate }}</td>
                             <td>{{ item.selling_rate }}</td>
-                            <td class="text-center">
-                                <input value="{{ item.id }}" name="ItemPK" type="checkbox" >
+                            <td>
+
+                                <label class="cont">
+                                    <input type="checkbox" value="{{ item.id }}" name="ItemPK">
+                                    <span class="checkmark" style="left: 80px;"></span>
+                                </label>
                             </td>
                         </tr>
                     {% endfor %}
@@ -76,4 +91,11 @@
             </table>
         </div>
     </form>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("tr:odd").addClass("odd");
+
+        });
+    </script>
 {% endblock %}
