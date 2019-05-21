@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, redirect, get_object_or_404
@@ -415,8 +414,6 @@ def add_item(request):
                                              tot_buy_price=amt,
                                              tot_sale_price=samt,
                                              grand_total=amt)
-                messages.success(request,
-                                 str(purchase_qty)+' ' + str(item) + '`s ' + 'has been created successfully!!! ')
                 Log.objects.create(user=request.user,
                                    subject="Add Item",
                                    detail='Item Name:' + str(item) + ' Quantity :' + str(purchase_qty) + '\n'
@@ -892,15 +889,46 @@ def make_transaction(request):
     return render(request, 'dashboard/make_transaction.html', context)
 
 
+def populate_with_name(request):
+    item_name = request.POST['item_name']
+    print(item_name)
+    try:
+        item = get_object_or_404(Item, item_name=item_name)
+        test = 1
+        data = {
+            'itemCode': item.item_code,
+            'itemName': item.item_name,
+            'itemQty': item.quantity,
+            'itemBuyRate': item.buying_rate,
+            'itemSaleRate': item.selling_rate,
+            'message': test
+        }
+    except ObjectDoesNotExist:
+        test = 0
+        data = {
+            'message': test
+        }
+    return JsonResponse(data)
+
+
 def populate_with_id(request):
     id = request.GET.get('item_id')
-    item = Item.objects.get(item_code=id)
-    data = {
-        'itemName': item.item_name,
-        'itemQty': item.quantity,
-        'itemBuyRate': item.buying_rate,
-        'itemSaleRate': item.selling_rate,
-    }
+    try:
+        item = Item.objects.get(item_code=id)
+        test = 1
+        data = {
+            'itemCode': item.item_code,
+            'itemName': item.item_name,
+            'itemQty': item.quantity,
+            'itemBuyRate': item.buying_rate,
+            'itemSaleRate': item.selling_rate,
+            'message': test
+        }
+    except ObjectDoesNotExist:
+        test = 0
+        data = {
+            'message': test
+        }
     return JsonResponse(data)
 
 
@@ -1077,3 +1105,9 @@ def return_due(request):
                 'customerDue': 'Invalid Data'
             }
             return JsonResponse
+
+
+
+def test_entry(request):
+    context = {}
+    return render(request, 'dashboard/test_entry_form.html', context)

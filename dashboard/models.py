@@ -52,7 +52,7 @@ class Inventory(models.Model):
 
 
 class Actor(models.Model):
-    email = models.EmailField(unique=True, max_length=50, verbose_name='Email Address')
+    email = models.EmailField(unique=True, max_length=50, verbose_name='Email Address', blank=True, null=True)
     f_name = models.CharField(max_length=50, verbose_name='First Name')
     l_name = models.CharField(max_length=50, verbose_name='Last Name')
     date_created = models.DateTimeField(default=now, verbose_name='Registered Date')

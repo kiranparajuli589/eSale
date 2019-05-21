@@ -57,7 +57,7 @@ class TransactionForm(forms.ModelForm):
 class CustomerAddForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['email', 'f_name', 'l_name', 'address', 'phone', 'image']
+        fields = ['f_name', 'l_name', 'address', 'phone','email', 'image']
 
 
 class CustomerUpdateForm(forms.ModelForm):
@@ -69,7 +69,7 @@ class CustomerUpdateForm(forms.ModelForm):
 class VendorAddForm(forms.ModelForm):
     class Meta:
         model = Vendor
-        fields = ['email', 'f_name', 'l_name', 'address', 'phone', 'image']
+        fields = ['f_name', 'l_name', 'address', 'phone', 'email', 'image']
 
 
 class VendorUpdateForm(forms.ModelForm):

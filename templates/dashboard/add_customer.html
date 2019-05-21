@@ -1,15 +1,20 @@
-{% extends 'dashboard/dashboard.html' %}
+{% extends 'dashboard/cus.html' %}
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <form method="POST" enctype="multipart/form-data" class="col-md-6">
-        <h3>Add Customer</h3><hr size="7">
-        {% csrf_token %}
-        <fieldset class="form-group">
-            {{ form|crispy }}
-        </fieldset>
-        <div class="form-group">
-            <button class="btn btn-info" type="submit">Add</button>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-5">
+            <form method="POST" enctype="multipart/form-data">
+                <h3>Add Customer</h3><hr size="7">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-info" type="submit">Add</button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 {% endblock %}
