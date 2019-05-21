@@ -490,6 +490,19 @@ def item_delete(request, pk):
 
 
 @login_required
+def transaction_delete(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    if request.method == 'POST':
+        transaction.delete()
+        messages.success(request, "Transaction Deleted Successfully!!!")
+        return redirect('transaction-tab')
+    context = {
+        'transaction': transaction
+    }
+    return render(request, 'dashboard/transaction_delete.html', context)
+
+
+@login_required
 def customer_stat(request):
     customer = Customer.objects.all().order_by('-date_created')
     return render(request, 'dashboard/customer_admin.html', {'customers': customer})
@@ -993,8 +1006,10 @@ def form_collect_make_transaction(request):
 
             recievedposn = keys.index('p_amt')
             p_type_posn = keys.index('payment_type')
-
-            recieved = decimal.Decimal(values[recievedposn])
+            if values[recievedposn] == '':
+                recieved = 0
+            else:
+                recieved = decimal.Decimal(values[recievedposn])
 
             if values[p_type_posn] == '1':
                 payment_type = 'CASH'
@@ -1009,7 +1024,8 @@ def form_collect_make_transaction(request):
                 customerposn = keys.index('customer')
                 customer_name = values[customerposn]
                 if customer_name == '' or not customer_name:
-                    customer = Customer.objects.get(email='others@xyz.com')
+                    customer, status = Customer.objects.get_or_create(f_name='Not', l_name='Registered',
+                                                                      email='others@xyz.com')
                 else:
                     cust_name = customer_name.split()
                     customer = Customer.objects.get(f_name=cust_name[0], l_name=cust_name[1])
@@ -1026,7 +1042,8 @@ def form_collect_make_transaction(request):
                 vendorposn = keys.index('vendor')
                 vend_name = values[vendorposn]
                 if vend_name == '' or not vend_name:
-                    vendor = Vendor.objects.get(email='others@xyz.com')
+                    vendor, status = Vendor.objects.get_or_create(f_name='Not', l_name='Registered',
+                                                                  email='others@xyz.com')
                 else:
                     customer_name = vend_name.split()
                     vendor = Vendor.objects.get(f_name=customer_name[0], l_name=customer_name[1])

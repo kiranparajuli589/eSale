@@ -27,7 +27,11 @@
             source: vendorNames
         });
 
-
+        $(document).on('change', '#p_type', function () {
+            if ($(this).val() == '2'){
+                $("#P_AMT").parent().hide();
+            }
+        });
 
         $(document).on('change', ".NAME",  function(){
                let itemName = $(this).val();
@@ -407,7 +411,7 @@
                         <option value="1">CASH</option>
                         <option value="2">CREDIT</option>
                     </select>
-                    <label>Payment AMT<input id="P_AMT" class="Input-text" type="text" required name="p_amt" min="{{ 0 }}"></label>
+                    <label>Payment AMT<input id="P_AMT" class="Input-text" type="text"  name="p_amt" min="{{ 0 }}"></label>
 
                 </div>
                 <div class="form-group text-center" style="padding-top: 20px">

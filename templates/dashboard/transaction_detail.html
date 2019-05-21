@@ -48,7 +48,7 @@
                                 <div class="footer">
                                     <div class="legend">
                                         <i class="fa fa-circle text-info"></i> Update
-                                        <i class="fa fa-circle text-danger"></i> Remove
+                                        <a href="{% url 'transaction-delete' transac.id %}"><i class="fa fa-circle text-danger"></i> Remove</a>
                                     </div>
                                     <hr>
                                     <div class="stats">
