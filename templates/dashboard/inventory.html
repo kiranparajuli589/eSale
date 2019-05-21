@@ -1,29 +1,15 @@
 {% extends 'dashboard/inv.html' %}
-{% load static %}
 
 {% block script %}
     <script>
-        function myFunction() {
-          // Declare variables
-          var input, filter, table, tr, td, i, txtValue;
-          input = document.getElementById("myInput");
-          filter = input.value.toUpperCase();
-          table = document.getElementById("myTable");
-          tr = table.getElementsByTagName("tr");
-
-          // Loop through all table rows, and hide those who don't match the search query
-          for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1];
-            if (td) {
-              txtValue = td.textContent || td.innerText;
-              if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-              } else {
-                tr[i].style.display = "none";
-              }
-            }
-          }
-        }
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
     </script>
 {% endblock %}
 
@@ -42,7 +28,7 @@
         </div>
     <br>
         <div class="content table-responsive table-full-width">
-            <table class="table" id="myTable">
+            <table class="table">
                 <thead style="background-color: #6396e8; color: whitesmoke;">
                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
@@ -51,7 +37,7 @@
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
                     <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
                 </thead>
-                <tbody>
+                <tbody id="myTable">
                     <style>
                         .odd {
                             background-color: #cdddf7; }

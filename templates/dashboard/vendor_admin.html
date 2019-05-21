@@ -1,29 +1,15 @@
 {% extends 'dashboard/ven.html' %}
-{% load static %}
 
 {% block script %}
     <script>
-        function myFunction() {
-          // Declare variables
-          var input, filter, table, tr, td, i, txtValue;
-          input = document.getElementById("myInput");
-          filter = input.value.toUpperCase();
-          table = document.getElementById("myTable");
-          tr = table.getElementsByTagName("tr");
-
-          // Loop through all table rows, and hide those who don't match the search query
-          for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1];
-            if (td) {
-              txtValue = td.textContent || td.innerText;
-              if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-              } else {
-                tr[i].style.display = "none";
-              }
-            }
-          }
-        }
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
     </script>
 {% endblock %}
 
@@ -38,7 +24,7 @@
             </div>
         </div>
         <div class="content table-responsive">
-            <table class="table table-hover table-striped" id="myTable">
+            <table class="table">
                 <thead style="background-color: #cbd5db">
                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Vendor</td>
@@ -47,7 +33,14 @@
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Phone</td>
 {#                    <td style="font-family: 'Noto Sans CJK SC Bold'"></td>#}
                 </thead>
-                <tbody>
+                <tbody id="myTable">
+                    <style>
+                        .odd {
+                            background-color: #c9e2b3; }
+
+                        .odd td {
+                            border-bottom: 1px solid #cef; }
+                    </style>
                     {% for vendor in vendors %}
                         <tr>
                             <td>{{ vendor.id }}</td>
@@ -64,4 +57,11 @@
                 </tbody>
             </table>
         </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("tr:odd").addClass("odd");
+
+        });
+    </script>
 {% endblock %}
