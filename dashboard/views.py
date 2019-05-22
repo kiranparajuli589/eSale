@@ -1,9 +1,8 @@
-import decimal
+import decimal, csv, io, pytz, json
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.safestring import mark_safe
@@ -17,8 +16,7 @@ from dashboard.models import (Item, Cart, Order, Transaction, CartItem, Customer
                               TransactionStat, TransactionStatMonth, TransactionStatYear)
 from accounts.models import Log
 from datetime import date, datetime
-import pytz
-
+from dashboard.resources import ExportExcel
 
 ktm = pytz.timezone('Asia/Kathmandu')
 now = ktm.localize(datetime.now())
@@ -1107,8 +1105,8 @@ def form_collect_make_transaction(request):
 
 
 def return_due(request):
-    if request.method == 'POST':
-        customer = request.POST['customer']
+    if request.method == 'FILES':
+        customer = request.FILES['customer']
         if customer or customer != '':
             customer_name = customer.split()
             cust = Customer.objects.get(f_name=customer_name[0],
@@ -1124,7 +1122,33 @@ def return_due(request):
             return JsonResponse
 
 
+@login_required()
+def import_export(request):
+    prompt = {
+        'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock'
+    }
 
-def test_entry(request):
+    if request.method == "GET":
+        return render(request, 'dashboard/import_export.html', prompt)
+
+    csv_item_file = request.FILES['myFile']
+
+    if not csv_item_file.name.endswith('.csv'):
+        messages.error(request, 'This is no CSV file!!')
+
+    data_set = csv_item_file.read().decode('UTF-8')
+    to_string = io.StringIO(data_set)
+    next(to_string)
+    for column in csv.reader(to_string, delimiter=',', quotechar='|'):
+        _, created = Item.objects.update_or_create(
+            item_code=column[0],
+            item_name=column[1],
+            quantity=int(column[2]),
+            selling_rate=decimal.Decimal(column[3]),
+            buying_rate=decimal.Decimal(column[4]),
+            minimum_stock=int(column[5]),
+
+        )
+
     context = {}
-    return render(request, 'dashboard/test_entry_form.html', context)
+    return render(request, 'dashboard/import_export.html', context)

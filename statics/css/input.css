@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Dosis');
-
+@import url('https://fonts.googleapis.com/css?family=Roboto:300&display=swap');
 :root {
   /* generic */
   --gutterSm: 0.4rem;
@@ -7,7 +7,10 @@
   --gutterLg: 1.6rem;
   --gutterXl: 2.4rem;
   --gutterXx: 7.2rem;
-  --fontFamily: "Dosis", sans-serif;
+  --colorPrimary400: #7e57c2;
+  --colorPrimary600: #5e35b1;
+  --colorPrimary800: #4527a0;
+  --fontFamily: "Roboto", sans-serif;
   --fontSizeSm: 1.2rem;
   --fontSizeMd: 1.6rem;
   --fontSizeLg: 2.1rem;
@@ -40,19 +43,11 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 10px;
-}
-
 body {
-  display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  width: 100vw;
-  height: 100vh;
-  color: #455A64;
-  background-color: #7E57C2;
+  color: #000000;
+  background-color: #FFFFFF;
   font-family: var(--fontFamily);
   font-size: var(--fontSizeMd);
   line-height: var(--lineHeightMd);
@@ -78,6 +73,22 @@ body {
   position: relative;
 }
 
+select {
+  padding-left:7px;
+  border: #1F77D0;
+  background-color: #ebccd1;
+}
+
+select:hover {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #1DC7EA;
+}
+
+html {
+  font-size: 10px;
+}
+
 .Input-text {
   display: block;
   margin: 0;
@@ -85,11 +96,10 @@ body {
   color: inherit;
   width: 100%;
   font-family: inherit;
-  font-size: var(--inputFontSize);
+  font-size: 16px;
   font-weight: inherit;
   line-height: var(--inputLineHeight);
   border: none;
-  border-radius: 0.4rem;
   transition: box-shadow var(--transitionDuration);
 }
 

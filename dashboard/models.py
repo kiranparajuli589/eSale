@@ -19,18 +19,18 @@ trans_type = (
 
 
 class Item(models.Model):
-    item_code = models.CharField(max_length=7, unique=True)
+    item_code = models.CharField(max_length=10, unique=True)
     item_name = models.CharField(max_length=255, unique=True)
-    buying_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    buying_rate_prev = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    selling_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    selling_rate_prev = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    item_image = models.ImageField(default='default_item.jpeg', upload_to='item_images')
-    minimum_stock = models.IntegerField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-
     quantity = models.IntegerField(null=True, blank=True)  # quantity in inventory
+    buying_rate = models.DecimalField(max_digits=15, decimal_places=2)
+    selling_rate = models.DecimalField(max_digits=15, decimal_places=2)
+    minimum_stock = models.IntegerField(null=True, blank=True)
+
     location_in_store = models.TextField(null=True, blank=True)  # location in inventory
+    buying_rate_prev = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    selling_rate_prev = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    item_image = models.ImageField(default='default_item.jpeg', upload_to='item_images')
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.item_name

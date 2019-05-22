@@ -6,7 +6,8 @@ from .views import (index, inventory,
                     vendor_stat, vendor_detail, add_vendor, vendor_update, vendor_delete, transaction_tab,
                     order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item, sale, start_sale,
                     start_purchase, make_transaction, populate_with_id, populate_with_qty,
-                    form_collect_make_transaction, return_due, populate_with_name, test_entry, transaction_delete)
+                    form_collect_make_transaction, return_due, populate_with_name, transaction_delete,
+                    import_export)
 
 
 urlpatterns = [
@@ -41,7 +42,7 @@ urlpatterns = [
     path('start/sale/<int:pk>/', start_sale, name='start-sale'),
     path('start/purchase/<int:pk>/', start_purchase, name='start-purchase'),
     path('make/transaction/', make_transaction, name='entry'),
-    path('transaction/entry', test_entry, name='test-entry'),
+    path('import/export/', import_export, name='import-export'),
 
     path('ajax/id/', populate_with_id, name='ajax-id'),
     path('ajax/name/', populate_with_name, name='ajax-name'),
