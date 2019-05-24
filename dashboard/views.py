@@ -1125,7 +1125,7 @@ def return_due(request):
 @login_required()
 def import_export(request):
     prompt = {
-        'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock'
+        'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock, location in store, description'
     }
 
     if request.method == "GET":
@@ -1147,6 +1147,8 @@ def import_export(request):
             selling_rate=decimal.Decimal(column[3]),
             buying_rate=decimal.Decimal(column[4]),
             minimum_stock=int(column[5]),
+            location_in_store=column[6],
+            description=column[7],
 
         )
 
