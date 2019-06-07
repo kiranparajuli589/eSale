@@ -5,7 +5,7 @@ from dashboard.models import (Item, Vendor, Customer, Cart, Order, Transaction, 
 
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('item_code', 'item_name', 'buying_rate', 'selling_rate')
+    list_display = ('item_code', 'item_name', 'quantity', 'buying_rate', 'selling_rate')
     list_filter = ('location_in_store',)
     search_fields = ('item_code', 'item_name', 'description')
     ordering = ('item_code', 'item_name', 'buying_rate', 'selling_rate')

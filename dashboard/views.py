@@ -1,5 +1,5 @@
 import decimal, csv, io, pytz, json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,12 +16,40 @@ from dashboard.models import (Item, Cart, Order, Transaction, CartItem, Customer
                               TransactionStat, TransactionStatMonth, TransactionStatYear)
 from accounts.models import Log
 from datetime import date, datetime
-from dashboard.resources import ExportExcel
+
 
 ktm = pytz.timezone('Asia/Kathmandu')
 now = ktm.localize(datetime.now())
 day = now.strftime("%A")
 month = now.strftime("%B")
+
+
+
+
+
+
+def test(request):
+    items = Item.objects.all().order_by('-id')
+    form = AddToCartCheckBox(request.POST)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            sel_id = request.POST.getlist('ItemPK')
+            cart = Cart(quantity=0)
+            cart.save()
+            for selected in sel_id:
+                item = Item.objects.get(id=selected)
+                cart.item.add(item)
+
+            order = Order.objects.create(cart=cart)
+            return redirect('cart-content', cart.id)
+
+    return render(request, 'dashboard/test.html', {'user': request.user,
+                                                        'items': items, })
+
+
+
+
 
 
 @login_required
@@ -148,7 +176,7 @@ def inventory(request):
                 cart.item.add(item)
 
             order = Order.objects.create(cart=cart)
-            return redirect('cart-content', cart.id)
+            return redirect('cart-content-inv', cart.id)
 
     return render(request, 'dashboard/inventory.html', {'user': request.user,
                                                         'items': items,})
@@ -164,11 +192,46 @@ def sale(request, pk):
     return redirect('cart-content', cart.id)
 
 
+
+
+@login_required
+def cart_content_inv(request, pk):
+    cart = Cart.objects.get(id=pk)
+    cart_item = cart.item.all()
+    form = CartInfo(request.POST)
+    if request.POST:
+        if 'sale' in request.POST:
+            print('sale checked')
+            if form.is_valid():
+                cart_qty = request.POST.getlist('cart_qty')
+                print(cart_qty)
+                i = 0
+                for c_i in cart_item:
+                    ca, created = CartItem.objects.get_or_create(item=c_i, cart_id=cart.id)
+                    ca.cart_qty = int(cart_qty[i])
+                    i += 1
+                    ca.save()
+                return redirect('cart-confirm', cart.id)
+        elif 'purchase' in request.POST:
+            print('purchase checked')
+            if form.is_valid():
+                cart_qty = request.POST.getlist('cart_qty')
+                i = 0
+                for c_i in cart_item:
+                    ca, created = CartItem.objects.get_or_create(item=c_i, cart_id=cart.id)
+                    ca.cart_qty = int(cart_qty[i])
+                    i += 1
+                    ca.save()
+                return redirect('cart-confirm-add-item', cart.id)
+    return render(request, 'dashboard/cart_content_inv.html', {'selecs': cart_item})
+
+
 @login_required
 def cart_content(request, pk):
     cart = Cart.objects.get(id=pk)
     cart_item = cart.item.all()
     form = CartInfo(request.POST)
+    order = Order.objects.get(cart=cart)
     if request.method == 'POST':
         if form.is_valid():
             cart_qty = request.POST.getlist('cart_qty')
@@ -178,7 +241,10 @@ def cart_content(request, pk):
                 ca.cart_qty = int(cart_qty[i])
                 i += 1
                 ca.save()
-            return redirect('cart-confirm', cart.id)
+            if order.vendor:
+                return redirect('cart-confirm-add-item', cart.id)
+            else:
+                return redirect('cart-confirm', cart.id)
     return render(request, 'dashboard/cart_content.html', {'selecs': cart_item})
 
 
@@ -309,6 +375,7 @@ def order_transaction(request, pk):
             return redirect('inventory')
 
     return render(request, 'dashboard/add_transaction.html', {'form': form,
+                                                              'cart_items': cart_item,
                                                               'order': order,
                                                               'transac': form.instance})
 
@@ -503,6 +570,44 @@ def transaction_delete(request, pk):
 @login_required
 def customer_stat(request):
     customer = Customer.objects.all().order_by('-date_created')
+
+    prompt = {
+        'order': 'Order of the CSV should be id(leave all blank), f_name, l_name, address, phone, email, tot_due, tot_recved'
+    }
+
+    if 'customerSubmit' in request.POST:
+        print('i am here')
+        csv_item_file = request.FILES['myFile']
+        if not csv_item_file:
+            messages.error(request, 'There is no CSV file!!')
+
+        if not csv_item_file.name.endswith('.csv'):
+            messages.error(request, 'This is no CSV file!!')
+
+        data_set = csv_item_file.read().decode('UTF-8')
+        to_string = io.StringIO(data_set)
+        next(to_string)
+        for column in csv.reader(to_string, delimiter=',', quotechar='|'):
+            obj, created = Customer.objects.get_or_create(
+                f_name=column[0],
+                l_name=column[1],
+                phone = int(column[3])
+            )
+
+            obj.address = column[2]
+            obj.email = column[4]
+            if column[5] == '':
+                obj.tot_due = 0
+            else:
+                obj.tot_due = decimal.Decimal(column[5])
+            if column[6] == "":
+                obj.tot_recved = 0
+            else:
+                obj.tot_recved = decimal.Decimal(column[6])
+
+            obj.save()
+        messages.success(request, 'Customer Import Successfull!!!')
+
     return render(request, 'dashboard/customer_admin.html', {'customers': customer})
 
 
@@ -594,129 +699,23 @@ def start_sale(request, pk):
 
 def start_purchase(request, pk):
     vendor = get_object_or_404(Vendor, pk=pk)
-    if request.method == 'POST':
-        if request.user.is_admin:
-            form = VendorAddItemForm(request.POST)
-            print(request.POST)
-            if form.is_valid():
-                item_id = form.cleaned_data.get('id')
-                name = form.cleaned_data.get('item_name')
-                purchase_qty = form.cleaned_data.get('quantity')
-                sale_rate = form.cleaned_data.get('sale_price')
-                buy_rate = form.cleaned_data.get('buy_price')
-
-                #  total amount/purchase-amount/quantity for cart and order
-                if sale_rate and buy_rate:
-                   pass
-                elif not buy_rate and not sale_rate:
-                    buy_rate = 0
-                    sale_rate = 0
-                elif not sale_rate:
-                    sale_rate = 0
-                elif not buy_rate:
-                    buy_rate = 0
-                else:
-                    pass
-                amt = float(purchase_qty) * float(buy_rate)
-                samt = float(purchase_qty) * float(sale_rate)
-
-                try:
-                    item = Item.objects.get(item_code=item_id, item_name=name)
-                    if purchase_qty:
-                        item.quantity += purchase_qty
-                    if sale_rate:
-                        item.selling_rate_prev = item.selling_rate
-                        item.selling_rate = sale_rate
-                    if buy_rate:
-                        item.buying_rate_prev = item.buying_rate
-                        item.buying_rate = buy_rate
-                    messages.success(request,
-                                     str(purchase_qty) + ' ' + str(item) + '`s ' + 'has been updated successfully!!! ')
-                    Log.objects.create(user=request.user,
-                                       subject="Update Item",
-                                       detail='Item Name:' + str(item) + ' Quantity :' + str(
-                                           purchase_qty) + '\n'
-                                              + 'Buying Rate: ' + str(buy_rate) + ' Selling Rate: ' + str(sale_rate))
-                except ObjectDoesNotExist:
-                    try:
-                        item = Item.objects.get(item_name=name)
-                        if item_id:
-                            item.item_code = item_id
-                        if purchase_qty:
-                            item.quantity += purchase_qty
-                        if sale_rate:
-                            item.selling_rate_prev = item.selling_rate
-                            item.selling_rate = sale_rate
-                        if buy_rate:
-                            item.buying_rate_prev = item.buying_rate
-                            item.buying_rate = buy_rate
-                        messages.success(request,
-                                         str(purchase_qty) + ' ' + str(
-                                             item) + '`s ' + 'has been updated successfully!!! ')
-                        Log.objects.create(user=request.user,
-                                           subject="Update Item",
-                                           detail='Item Name:' + str(item) + ' Quantity :' + str(
-                                               purchase_qty) + '\n'
-                                                  + 'Buying Rate: ' + str(buy_rate) + ' Selling Rate: ' + str(sale_rate))
-                    except ObjectDoesNotExist:
-                        try:
-                            item = Item.objects.get(item_code=item_id)
-                            if name:
-                                item.item_name = name
-                            if purchase_qty:
-                                item.quantity += purchase_qty
-                            if sale_rate:
-                                item.selling_rate_prev = item.selling_rate
-                                item.selling_rate = sale_rate
-                            if buy_rate:
-                                item.buying_rate_prev = item.buying_rate
-                                item.buying_rate = buy_rate
-                            messages.success(request,
-                                             str(purchase_qty) + ' ' + str(
-                                                 item) + '`s ' + 'has been updated successfully!!! ')
-                            Log.objects.create(user=request.user,
-                                               subject="Update Item",
-                                               detail='Item Name:' + str(item) + ' Quantity :' + str(
-                                                   purchase_qty) + '\n'
-                                                      + 'Buying Rate: ' + str(buy_rate) + ' Selling Rate: ' + str(sale_rate))
-                        except ObjectDoesNotExist:
-                            item = Item(item_code=item_id,
-                                        item_name=name,
-                                        quantity=purchase_qty,
-                                        selling_rate=sale_rate,
-                                        buying_rate=buy_rate)
-                            messages.success(request,
-                                             str(purchase_qty) + ' ' + str(
-                                                 item) + '`s ' + 'has been created successfully!!! ')
-                            Log.objects.create(user=request.user,
-                                               subject="Add Item",
-                                               detail='Item Name:' + str(item) + ' Quantity :' + str(
-                                                   purchase_qty) + '\n'
-                                                      + 'Buying Rate: ' + str(buy_rate) + ' Selling Rate: ' + str(
-                                                   sale_rate))
-                item.save()
-                cart = Cart(quantity=purchase_qty)  # cart created for form instance
-                cart.save()
+    items = Item.objects.all()
+    form = AddToCartCheckBox(request.POST)
+    if request.method == "POST":
+        if form.is_valid():
+            sel_id = request.POST.getlist('ItemPK')
+            cart = Cart(quantity=0)
+            cart.save()
+            for selected in sel_id:
+                item = Item.objects.get(id=selected)
                 cart.item.add(item)
 
-                cart_item = CartItem.objects.create(cart_id=cart.id, item=item,
-                                                    cart_qty=purchase_qty, cart_amt=amt)
-                order = Order.objects.create(cart=cart,
-                                             tot_buy_price=amt,
-                                             tot_sale_price=samt,
-                                             grand_total=float(amt),
-                                             vendor=vendor)
-
-                return redirect('cart-confirm-add-item', cart.id)
-        else:
-            messages.warning(request, 'Permission Denied!!')
-            return redirect('inventory')
-    else:
-        form = VendorAddItemForm()
+            order = Order.objects.create(cart=cart, vendor=vendor)
+            return redirect('cart-content', cart.id)
     context = {
-        'form': form,
+        'items': items
     }
-    return render(request, 'dashboard/vendor_add_item.html', context)
+    return render(request, 'dashboard/startpurchase.html', context)
 
 
 
@@ -762,6 +761,42 @@ def customer_delete(request, pk):
 @login_required
 def vendor_stat(request):
     vendor = Vendor.objects.all().order_by('-date_created')
+    prompt = {
+        'order': 'Order of the CSV should be id(leave all blank), f_name, l_name, address, phone, email, tot_due, tot_recved'
+    }
+
+    if 'vendorSubmit' in request.POST:
+        print('i am here')
+        csv_item_file = request.FILES['myFile']
+        if not csv_item_file:
+            messages.error(request, 'There is no CSV file!!')
+
+        if not csv_item_file.name.endswith('.csv'):
+            messages.error(request, 'This is no CSV file!!')
+
+        data_set = csv_item_file.read().decode('UTF-8')
+        to_string = io.StringIO(data_set)
+        next(to_string)
+        for column in csv.reader(to_string, delimiter=',', quotechar='|'):
+            obj, created = Vendor.objects.get_or_create(
+                f_name=column[0],
+                l_name=column[1],
+                phone=int(column[3])
+            )
+
+            obj.address = column[2]
+            obj.email = column[4]
+            if column[5] == '':
+                obj.tot_due = 0
+            else:
+                obj.tot_due = decimal.Decimal(column[5])
+            if column[6] == "":
+                obj.tot_recved = 0
+            else:
+                obj.tot_recved = decimal.Decimal(column[6])
+
+            obj.save()
+        messages.success(request, 'Vendor Import Successfull!!!')
     return render(request, 'dashboard/vendor_admin.html', {'vendors': vendor})
 
 
@@ -1125,32 +1160,129 @@ def return_due(request):
 @login_required()
 def import_export(request):
     prompt = {
-        'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock, location in store, description'
+        'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock, location_in_store, description'
     }
 
     if request.method == "GET":
         return render(request, 'dashboard/import_export.html', prompt)
 
-    csv_item_file = request.FILES['myFile']
+    if 'itemSubmit' in request.POST:
+        csv_item_file = request.FILES['myFile']
 
-    if not csv_item_file.name.endswith('.csv'):
-        messages.error(request, 'This is no CSV file!!')
+        if not csv_item_file.name.endswith('.csv'):
+            messages.error(request, 'This is no CSV file!!')
 
-    data_set = csv_item_file.read().decode('UTF-8')
-    to_string = io.StringIO(data_set)
-    next(to_string)
-    for column in csv.reader(to_string, delimiter=',', quotechar='|'):
-        _, created = Item.objects.update_or_create(
-            item_code=column[0],
-            item_name=column[1],
-            quantity=int(column[2]),
-            selling_rate=decimal.Decimal(column[3]),
-            buying_rate=decimal.Decimal(column[4]),
-            minimum_stock=int(column[5]),
-            location_in_store=column[6],
-            description=column[7],
+        data_set = csv_item_file.read().decode('UTF-8')
+        to_string = io.StringIO(data_set)
+        next(to_string)
+        for column in csv.reader(to_string, delimiter=',', quotechar='|'):
+            obj, created = Item.objects.get_or_create(
+                item_code=column[0],
+                item_name=column[1],
+            )
+            print(decimal.Decimal(column[3]))
+            obj.buying_rate = decimal.Decimal(column[3])
+            obj.selling_rate = decimal.Decimal(column[4])
+            obj.minimum_stock = int(column[5])
+            obj.location_in_store = column[6]
+            obj.description = column[7]
+            if created:
+                obj.quantity = column[2]
+            else:
+                obj.quantity += int(column[2])
+            obj.save()
+        messages.success(request, 'File Import Successfull!!!')
 
-        )
 
     context = {}
     return render(request, 'dashboard/import_export.html', context)
+
+
+def export_items_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="item_list.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Item Code',
+        'Item Name',
+        'Quantity',
+        'Buying Rate',
+        'Selling Rate',
+        'Minimum Stock',
+        'Location in Store'
+    ])
+
+    items = Item.objects.all().values_list(
+        'item_code',
+        'item_name',
+        'quantity',
+        'buying_rate',
+        'selling_rate',
+        'minimum_stock',
+        'location_in_store'
+    )
+    for item in items:
+        writer.writerow(item)
+
+    return response
+
+
+def export_customer(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'First Name',
+        'Last Name',
+        'Address',
+        'Phone',
+        'Email',
+        'Total Due',
+        'Total Received'
+    ])
+
+    customers = Customer.objects.all().values_list(
+        'f_name',
+        'l_name',
+        'address',
+        'phone',
+        'email',
+        'tot_due',
+        'tot_recved'
+    )
+    for customer in customers:
+        writer.writerow(customer)
+
+    return response
+
+
+def export_vendor(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'First Name',
+        'Last Name',
+        'Address',
+        'Phone',
+        'Email',
+        'Total Due',
+        'Total Received'
+    ])
+
+    vendors = Vendor.objects.all().values_list(
+        'f_name',
+        'l_name',
+        'address',
+        'phone',
+        'email',
+        'tot_due',
+        'tot_recved'
+    )
+    for vendor in vendors:
+        writer.writerow(vendor)
+
+    return response

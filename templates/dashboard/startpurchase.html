@@ -1,0 +1,106 @@
+{% extends 'dashboard/ven.html' %}
+
+{% block script %}
+    <script>
+        function myFunction() {
+            // Declare variables
+            var input, filter, table, tbody, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="header">
+                <h2><i class="pe-7s-cart"></i>Check Items to add to purchase list:</h2>
+    </div>
+        <div class="content">
+
+            <div class="text-center">
+                {% include 'dashboard/search_bar.html' %}
+            </div>
+            <form method="POST">
+            {% csrf_token %}
+                <button class="btn btn-primary pull-right" type="submit"><i class="pe-7s-angle-right-circle"></i> TO CART</button>
+                <br><br>
+                <div class="content table-responsive table-full-width" id="checkedTable">
+                    <table class="table">
+                        <thead style="background-color: #2f3a4b; color: whitesmoke;">
+                            <td><b>Item Name</b></td>
+                            <td><b>Quantity</b></td>
+                            <td><b>Sale Rate</b></td>
+                            <td class="text-center"><b>Add to Cart</b></td>
+                        </thead>
+                        <tbody id="checkedTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="content table-responsive table-full-width">
+                    <table class="table table-hover">
+                        <thead style="background-color: #4055a4; color: #ffffff">
+                            <td><b>Item Name</b></td>
+                            <td><b>Quantity</b></td>
+                            <td><b>Sale Rate</b></td>
+                            <td class="text-center"><b>Add to Cart</b></td>
+                        </thead>
+                        <tbody id="myTable">
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <a id="item{{ forloop.counter }}" href="{% url 'item-detail' item.pk %}">
+                                        {{ item.item_name }}
+                                    </a></td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.selling_rate }}</td>
+                                <td style="padding-left: 40px">
+
+                                    <label class="cont">
+                                        <input type="checkbox" value="{{ item.id }}" name="ItemPK">
+                                        <span class="checkmark" style="left: 80px; margin-bottom: -20px"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $("#checkedTable").hide();
+        $(document).on('click', 'input[type="checkbox"]', function () {
+            if ($(this).prop('checked') === true) {
+                console.log('check');
+                $(this).parent().parent().parent().prependTo("#checkedTableBody");
+            }
+            if ($(this).prop("checked") === false) {
+                console.log('uncheck');
+                $(this).parent().parent().parent().prependTo("#myTable");
+            };
+            let i= $("form input[type='checkbox']:checked").length;
+            if (i>0) {
+                $("#checkedTable").show();
+            }
+            else {
+                $("#checkedTable").hide();
+            }
+        })
+    </script>
+{% endblock %}

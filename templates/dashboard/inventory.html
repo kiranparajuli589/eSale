@@ -21,15 +21,28 @@
     <form method="POST">
         {% csrf_token %}
         <div class="row">
-            <div class="col-sm-10"><h2>Store</h2></div>
+            <div class="col-sm-10"><h2>Store Item List</h2></div>
             <div class="col-sm-2" style="padding-top: 25px">
                 <button type="submit" class="btn btn-primary"><i class="pe-7s-cart"></i> To Cart</button>
             </div>
         </div>
-    <br>
+        <br>
+        <div class="content table-responsive table-full-width" id="checkedTable">
+            <table class="table">
+                <thead style="background-color: #2f3a4b; color: whitesmoke;">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Purchase Rate</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                    <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
+                </thead>
+                <tbody id="checkedTableBody"></tbody>
+            </table>
+        </div>
         <div class="content table-responsive table-full-width">
             <table class="table">
-                <thead style="background-color: #6396e8; color: whitesmoke;">
+                <thead style="background-color: #335386; color: whitesmoke;">
                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
                     <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
@@ -67,7 +80,7 @@
                             <td>
 
                                 <label class="cont">
-                                    <input type="checkbox" value="{{ item.id }}" name="ItemPK">
+                                    <input type="checkbox" value="{{ item.id }}" name="ItemPK" class="myCheckBox">
                                     <span class="checkmark" style="left: 80px;"></span>
                                 </label>
                             </td>
@@ -79,9 +92,23 @@
     </form>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
-        $(document).ready(function(){
-            $("tr:odd").addClass("odd");
-
-        });
+        $("#checkedTable").hide();
+        $(document).on('click', 'input[type="checkbox"]', function () {
+            if ($(this).prop('checked') === true) {
+                console.log('check');
+                $(this).parent().parent().parent().prependTo("#checkedTableBody");
+            }
+            if ($(this).prop("checked") === false) {
+                console.log('uncheck');
+                $(this).parent().parent().parent().prependTo("#myTable");
+            };
+            let i= $("form input[type='checkbox']:checked").length;
+            if (i>0) {
+                $("#checkedTable").show();
+            }
+            else {
+                $("#checkedTable").hide();
+            }
+        })
     </script>
 {% endblock %}

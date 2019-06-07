@@ -31,6 +31,10 @@
             if ($(this).val() == '2'){
                 $("#P_AMT").parent().hide();
             }
+            if ($(this).val() == '1'){
+                $("#P_AMT").parent().show();
+            }
+
         });
 
         $(document).on('change', ".NAME",  function(){
@@ -366,7 +370,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card" style="background-color: #c7ddef">
+    <div class="container-fluid" style="background-color: #d0e9c6">
         <div class="header" style="font-size: xx-large">Entry</div>
         <div class="content">
             <form class="transaction-entry-form" method="POST" autocomplete="off">

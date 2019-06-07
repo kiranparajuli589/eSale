@@ -45,10 +45,8 @@
     <div class="sidebar" data-color="purple" data-image="{% static 'img/sidebar-5.jpg' %}">
 
     <!--
-
         Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
         Tip 2: you can also add an image using data-image tag
-
     -->
 
     	<div class="sidebar-wrapper">
@@ -118,7 +116,7 @@
     </div>
 
     <div class="main-panel">
-        <nav class="navbar navbar-ct-red navbar-fixed" style="background-color: #1D62F0">
+        <nav class="navbar navbar-ct-red navbar-fixed" style="background-color: #5a277a;">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
@@ -137,12 +135,12 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li>
                            <a href="{% url 'profile' %}">
-                               <p>{{ user.f_name }}</p>
+                               <p style="color: #ffffff">{{ user.f_name }}</p>
                            </a>
                         </li>
                         <li>
                             <a href="{% url 'logout' %}">
-                                <p>Logout</p>
+                                <p style="color: #ffffff">Logout</p>
                             </a>
                         </li>
 						<li class="separator hidden-lg"></li>

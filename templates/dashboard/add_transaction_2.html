@@ -4,7 +4,26 @@
 {% block content %}
     <h3 class="title">Add Transaction Detail</h3>
     <hr style="height: 1px; background-color: #DDDDDD">
-    <form method="POST" enctype="multipart/form-data" class="col-md-4">
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="header">
+                    <h3><i class="pe-7s-cart"></i> Your Cart Details:</h3>
+                </div>
+                <div class="content" style="font-size: large">
+                    Vendor: <p class="text-danger" style="font-size: large">{{ order.vendor }}</p>
+                    Cart Items: {{ cart_items.count }}<br>
+                    Total Amount Rendered: <p class="text-danger" style="font-size: large">{{ order.tot_buy_price }}</p>
+                    Discount: {{ order.dis_amt }} <br>
+                    Grand Total: <p class="text-danger inline-group" style="font-size: xx-large">{{ order.grand_total }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h3>Transaction Detail</h3>
+
+            <form method="POST" enctype="multipart/form-data" class="col-md-4">
         {% csrf_token %}
         <fieldset class="form-group">
              <style>
@@ -18,17 +37,21 @@
                 <label style="padding-right: 86px"> Vendor </label>
                  {{ form.vendor }}
             {% endif %}
-            <br><br>
+            <br>
             <div class="row" id="pamt">
                 <label class="col-md-5">Payment Amt</label>
                 <input class="col-md-12" type="number" max="{{ order.grand_total }}" min="{{ 0 }}"
-                       name="received" class="form-control" style="width: 13.1em; height: 33px;">
+                       name="received" class="form-control" style="width: 13.1em; height: 33px; margin-left: 13px">
             </div>
         </fieldset>
         <div class="form-group">
-            <button class="btn btn-info" type="submit">Add</button>
+            <button class="btn btn-primary" type="submit">Add</button>
         </div>
     </form>
+        </div>
+    </div>
+
+
 
     <script>
         let e = document.getElementById("id_payment_type");

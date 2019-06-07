@@ -21,9 +21,9 @@ trans_type = (
 class Item(models.Model):
     item_code = models.CharField(max_length=10, unique=True)
     item_name = models.CharField(max_length=255, unique=True)
-    quantity = models.IntegerField(null=True, blank=True)  # quantity in inventory
-    buying_rate = models.DecimalField(max_digits=15, decimal_places=2)
-    selling_rate = models.DecimalField(max_digits=15, decimal_places=2)
+    quantity = models.IntegerField(default=0)
+    buying_rate = models.DecimalField(max_digits=15, decimal_places=2, null=True)
+    selling_rate = models.DecimalField(max_digits=15, decimal_places=2, null=True)
     minimum_stock = models.IntegerField(null=True, blank=True)
 
     location_in_store = models.TextField(null=True, blank=True)  # location in inventory
@@ -52,12 +52,14 @@ class Inventory(models.Model):
 
 
 class Actor(models.Model):
-    email = models.EmailField(unique=True, max_length=50, verbose_name='Email Address', blank=True, null=True)
     f_name = models.CharField(max_length=50, verbose_name='First Name')
     l_name = models.CharField(max_length=50, verbose_name='Last Name')
-    date_created = models.DateTimeField(default=now, verbose_name='Registered Date')
+
     address = models.CharField(max_length=50, null=True, blank=True)
-    phone = models.IntegerField(verbose_name='Phone Number', unique=True, null=True, blank=True)
+    phone = models.IntegerField(verbose_name='Phone Number', unique=True)
+    email = models.EmailField(unique=True, max_length=50, verbose_name='Email Address', blank=True, null=True)
+    date_created = models.DateTimeField(default=now, verbose_name='Registered Date')
+
     tot_due = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     tot_recved = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 

@@ -29,7 +29,7 @@
 {% block content %}
     <div class="card">
             <div class="header">
-                <h2><i class="pe-7s-cart"></i>Check Items to add to Cart</h2>
+                <h2><i class="pe-7s-cart"></i>Check Items to add to sale list:</h2>
             </div>
             <div class="content">
 
@@ -40,17 +40,27 @@
                 {% csrf_token %}
                     <button class="btn btn-primary pull-right" type="submit"><i class="pe-7s-angle-right-circle"></i> TO CART</button>
 
-
-
-                    <div class="content table-responsive table-full-width">
-                        <table class="table table-hover" id="myTable">
-                            <thead>
-                            <td><b>Item Name</b></td>
-                            <td><b>Quantity</b></td>
-                            <td><b>Sale Rate</b></td>
-                            <td class="text-center"><b>Add to Cart</b></td>
+                    <br><br>
+                    <div class="content table-responsive table-full-width" id="checkedTable">
+                        <table class="table">
+                            <thead style="background-color: #2f3a4b; color: whitesmoke;">
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                                <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
                             </thead>
-                            <tbody>
+                            <tbody id="checkedTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover">
+                            <thead>
+                                <td><b>Item Name</b></td>
+                                <td><b>Quantity</b></td>
+                                <td><b>Sale Rate</b></td>
+                                <td class="text-center"><b>Add to Cart</b></td>
+                            </thead>
+                            <tbody id="myTable">
                             {% for item in items %}
 
                                 <tr>
@@ -75,4 +85,25 @@
                 </form>
             </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $("#checkedTable").hide();
+        $(document).on('click', 'input[type="checkbox"]', function () {
+            if ($(this).prop('checked') === true) {
+                console.log('check');
+                $(this).parent().parent().parent().prependTo("#checkedTableBody");
+            }
+            if ($(this).prop("checked") === false) {
+                console.log('uncheck');
+                $(this).parent().parent().parent().prependTo("#myTable");
+            }
+            let i= $("form input[type='checkbox']:checked").length;
+            if (i>0) {
+                $("#checkedTable").show();
+            }
+            else {
+                $("#checkedTable").hide();
+            }
+        })
+    </script>
 {% endblock %}

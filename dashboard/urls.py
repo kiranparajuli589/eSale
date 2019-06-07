@@ -7,7 +7,7 @@ from .views import (index, inventory,
                     order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item, sale, start_sale,
                     start_purchase, make_transaction, populate_with_id, populate_with_qty,
                     form_collect_make_transaction, return_due, populate_with_name, transaction_delete,
-                    import_export)
+                    import_export, export_items_csv, test, cart_content_inv, export_customer, export_vendor)
 
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
     path('item/delete/<int:pk>/', item_delete, name='item-delete'),
     path('item/sale/<int:pk>/', sale, name='sale-item'),
     path('cart/content/<int:pk>/', cart_content, name='cart-content'),
+    path('cart/content/inv/<int:pk>/', cart_content_inv, name='cart-content-inv'),
     path('cart/confirm/<int:pk>/', cart_confirm, name='cart-confirm'),
     path('cart/confirm/item/add/<int:pk>/', cart_confirm_add_item, name='cart-confirm-add-item'),
     path('transaction/<int:pk>/', order_transaction, name='order-transaction'),
@@ -43,6 +44,10 @@ urlpatterns = [
     path('start/purchase/<int:pk>/', start_purchase, name='start-purchase'),
     path('make/transaction/', make_transaction, name='entry'),
     path('import/export/', import_export, name='import-export'),
+    path('export/csv/', export_items_csv, name='export_items_csv'),
+    path('export/customer/', export_customer, name='export-customer'),
+    path('export/vendor/', export_vendor, name='export-vendor'),
+    path('test/', test, name='test'),
 
     path('ajax/id/', populate_with_id, name='ajax-id'),
     path('ajax/name/', populate_with_name, name='ajax-name'),
