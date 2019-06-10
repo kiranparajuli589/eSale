@@ -294,7 +294,7 @@
                 success: function (data) {
                     $("#"+id).find('#tot1').val(data.itemTotal);
                     var amtArry = $(".test1").serializeArray();
-                    console.log(amtArry)
+                    console.log(amtArry);
                     let sum=0;
                     for (i=0; i<amtArry.length; i++){
                         sum += parseInt(amtArry[i].value);
@@ -343,7 +343,6 @@
             $("#CUST").val("");
         });
         $(document).on('click', '#submit', function () {
-            {#var itemData = $("#duplicater").parent().find('.test').serializeArray();#}
             var formData = $(".transaction-entry-form").serializeArray();
             {#console.log(itemData);#}
             $.ajax({
@@ -395,7 +394,6 @@
                         <label>Item Name<input id="NAME" class="NAME Input-text" type="text" required name="name"></label>
                         <label>Available<input id="aQTY" class="Input-text" type="text" disabled></label>
                         <label>Unit Price<input id="UP" class="Input-text" type="text" disabled></label>
-                        <label>QTY<input class="test0 Input-text" type="text" required name="qty" min="{{ 1 }}"></label>
                         <label>Total<input id="tot1" class="test1 Input-text" readonly="readonly" type="text" name="tot1"></label>
 
                     </div>

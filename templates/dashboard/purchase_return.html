@@ -1,0 +1,182 @@
+{% extends 'dashboard/ven.html' %}
+
+
+{% block script %}
+    <script>
+        $(document).on('keypress', '.item', function (e) {
+            let maxlimit = parseInt($(this).prop('max'));
+            var currentValue = String.fromCharCode(e.which);
+            if (currentValue == '-'){
+                e.preventDefault();
+                $('<div class="text-danger">Negative Input Not Allowed!</div>')
+                .insertAfter($(this))
+                .delay(500)
+                .fadeOut(function() {
+                    $(this).remove();
+                });
+            }
+            var finalValue = $(this).val() + currentValue;
+            if(finalValue > maxlimit || finalValue < 0){
+                e.preventDefault();
+                $('<div class="text-danger">INVALID INPUT!!</div>')
+                .insertAfter($(this))
+                .delay(500)
+                .fadeOut(function() {
+                    $(this).remove();
+                })
+            }
+        });
+        $(document).on('click', '#submit', function (e) {
+            $("#acceptMeDiv").show(70);
+            let acceptMe = $("#acceptMe").prop('checked');
+            let tID = $("#acceptMe").prop('value');
+            console.log(tID);
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: '{% url 'ajax-purchase-return' %}',
+                data: {
+                    'form_data': $(".qtyForm").serializeArray(),
+                    'accept': acceptMe,
+                    't_id': tID,
+                    'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $("#totItems").html(data.totalReturnItems);
+                    $("#totAmt").html(data.totalReturn);
+                    $("#customer").html(data.vendorName);
+                    if (data.message === 'success'){
+                        console.log('success');
+                        $("#submit").attr('disabled', true);
+                        url = "http://127.0.0.1:8000/vendor/detail/";
+                        url +=  data.vId;
+                        window.location.replace(url);
+                    }
+                    else if ( data.message === 'empty') {
+                        $("#message").html('Purchase return failed!! No items to return!!!');
+                        $("#message").show();
+                        $("body,html").animate(
+                          {
+                            scrollTop: $("#message").offset().top
+                          },
+                          500 //speed
+                        );
+                        $("#message").fadeOut(2400);
+                    }
+                    else if (data.message === 'unchecked') {
+                        $("#message2").html('Purchase return failed!! Check verification checkbox!!!');
+                        $("#message2").show();
+                        $("body,html").animate(
+                          {
+                            scrollTop: $("#acceptMeDiv").offset().top
+                          },
+                          500 //speed
+                        );
+                        $("#message2").fadeOut(2400);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    <style>
+        table, th, td {
+            border: 3px solid #ffffff;
+            border-radius: 12px;
+        }
+        th, td {
+          padding: 10px;
+          text-align: left;
+        }
+        input {
+            font-size: 14px;
+            border-color: #1688c5;
+            color: #000000;
+            padding: 0px 5px 0px 5px;
+        }
+        tr:hover {
+            background-color: #a9d3f9;
+        }
+
+    </style>
+    <p id="message" style="padding: 8px; color: #ffffff; background-color: red; width: 100%" hidden></p>
+    <div class="row">
+
+        <div class="col-md-6 text-center">
+            <div class="card" id="saleReturn">
+
+                <h3 style="padding: 20px 0 0 0;border-bottom: 2px solid #0a2355">PURCHASE RETURN MENU:</h3>
+
+                        <form method="POST" class="qtyForm">
+                            {% csrf_token %}
+
+                            <h3 style="margin: 0; padding: 13px">Item List:</h3>
+
+                            <div class="table-responsive text-center" style="padding: 0 20px 0 20px;">
+                                    <table>
+                                        <thead style="background-color: #5a6ceb; color: #ffffff;">
+                                            <th>Item ID</th>
+                                            <th>Item Name</th>
+                                            <th>Cart Qty</th>
+                                            <th>Available Return Qty</th>
+                                            <th>Return Qty</th>
+                                        </thead>
+                                        <tbody id="myTable">
+                                            {% for item in cart_items %}
+                                                <tr>
+                                                    <td>{{ item.item.item_code }}</td>
+                                                    <td  style="font-size: 17px; color: #cf3441">{{ item.item.item_name }}</td>
+                                                    <td class="text-center">{{ item.cart_qty }}</td>
+                                                    <td class="text-center">{{ item.return_qty }}</td>
+                                                    <td class="text-center">
+
+                                                        <div name="{{ item.cart_id }}">
+                                                            {% if item.return_qty > 0 %}
+                                                                <input name='{{ item.item.item_code }}' class="item" type="number" min="{{ 1 }}" max="{{ item.return_qty }}" placeholder="1" style="background-color: #ede5f2">
+                                                            {% endif %}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <hr style="height:3px;">
+                                    <div class="text-center">
+                                        <button id="submit" class="btn btn-primary" style="margin: 0 0 20px 0;">
+                                            <i class="pe-7s-gleam"></i>
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                        </form>
+
+            </div>
+        </div>
+        <p id="message2" style="padding: 8px; color: #ffffff; background-color: red; width: 100%" hidden></p>
+        <div class="col-md-6 text-center">
+            <div class="card" id="returnDetailCard">
+                <h3 style="padding: 20px 0 0 0;border-bottom: 2px solid #0a2355">RETURN DETAILS:</h3>
+                <div style="font-size: large">
+                    <strong>TOTAL NO. OF ITEMS</strong>:<p id="totItems" style="font-size: large"></p>
+                    <strong>Customer</strong>:<p id="customer" style="font-size: large"></p>
+                </div>
+                <div style="font-size: xx-large">
+                    <strong>TOTAL RETURN AMOUNT </strong>:<p id="totAmt" class="text-danger" style="font-size: xx-large"></p>
+                </div>
+                <div id="acceptMeDiv"  hidden>
+                    <label for="acceptMe">Verify Return (Admin Use Only)</label><br>
+                    <input style="transform: scale(2); margin: 0; padding:0;" type="checkbox" name="accept" id="acceptMe" class="text-center" value="{{ transaction.id }}">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

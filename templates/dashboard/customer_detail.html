@@ -24,37 +24,68 @@
             }
         }
     </script>
+    <script>
+        $(document).on('click', "input[type='radio']", function () {
+            let tId = $(this).prop('value');
+            $.ajax({
+                type: "GET",
+                url: '{% url 'ajax-check' %}',
+                data: {
+                    'transaction_id': tId
+                    {#'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()#}
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.check === 'true') {
+                        console.log('trues');
+                        $(this).slideToggle();
+                        console.log(('happy'))
+
+                    }
+                    else {
+                        console.log('false');
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        })
+    </script>
+
 {% endblock %}
 
 {% block content %}
      <div class="row">
             <div class="col-md-8 col-lg-offset-2">
                 <div class="card ">
-                    <div class="header">
-                        <div class="media-left">
-                            <img class="rounded-circle account-img" src="{{ customer.image.url }}" style="width:150px">
-                        </div>
-                        <div class="media-body">
-                            <h3 class="account-heading">{{ customer.get_customer_name }}</h3>
-                            <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.address }}</p>
-                            <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
-                            <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ customer.date_created }}</p>
-                        </div>
-                        <div class="media-bottom">
-                            <div class="legend">
-                                <br>
-                                <a class="btn btn-info" href="{% url 'customer-update' customer.id %}">Update</a>
-						        <a class="btn btn-danger" href="{% url 'customer-delete' customer.id %}">Remove</a>
-                                <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-customer' customer.id %}">PAY DUE</a>
-                                <a class="btn btn-lg btn-primary pull-right"
-                                   style="margin-top: -20px;"
-                                   href="{% url 'start-sale' customer.id %}">
-                                    START SALE
-                                </a>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="header">
+                            <div class="media-left">
+                                <img class="rounded-circle account-img" src="{{ customer.image.url }}" style="width:150px">
+                            </div>
+                            <div class="media-body">
+                                <h3 class="account-heading">{{ customer.get_customer_name }}</h3>
+                                <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.address }}</p>
+                                <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ customer.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
+                                <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ customer.date_created }}</p>
+                            </div>
+                            <div class="media-bottom">
+                                <div class="legend">
+                                    <br>
+                                    <a class="btn btn-info" href="{% url 'customer-update' customer.id %}">Update</a>
+                                    <a class="btn btn-danger" href="{% url 'customer-delete' customer.id %}">Remove</a>
+                                    <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-customer' customer.id %}">PAY DUE</a>
+                                    <a class="btn btn-lg btn-primary pull-right"
+                                       style="margin-top: -20px;"
+                                       href="{% url 'start-sale' customer.id %}">
+                                        START SALE
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="content">
+                        <div class="content">
                         <h4 class="text-center">TRANSACTION DETAILS</h4>
                         <div class="content table-responsive table-full-width">
                             <table class="table table-striped">
@@ -72,6 +103,12 @@
                                 </tr>
                             </table>
                         </div>
+
+                        <button type="submit" class="btn btn-danger pull-right" style="font-size: 16px; margin-bottom: 20px; margin-right: 20px">
+                            SALE RETURN
+                            <i class="pe-7s-back-2" style="font-size: xx-large"></i>
+                        </button>
+
                         <div class="content table-responsive table-full-width">
                             <table class="table table-hover table-striped">
                                 <thead style="background-color: #cbd5db">
@@ -81,6 +118,7 @@
                                 <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
                                 <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
                                 <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
+                                <td style="font-family: 'Noto Sans CJK SC Bold'" class="text-center">SALE RETURN</td>
                                 </thead>
                                 <tbody>
                                 {% for transac in transacs %}
@@ -89,7 +127,6 @@
                                             <a href="{% url 'transaction_detail' transac.id %}">
                                                 {% if transac.order.id %}
                                                     {{ transac.order.id }}
-                                                    {#                                                    </a>#}
                                                 {% else %}
                                                     0 {{ transac.id }}
                                                 {% endif %}</a>
@@ -105,6 +142,15 @@
                                         <td>{{ transac.received }}</td>
                                         <td>{{ transac.due_amount }}</td>
                                         <td>{{ transac.timestamp|date }}</td>
+                                        <td class="text-center">
+                                            {% if transac.timestamp|timesince:now < "2 days" or transac.timestamp|timesince:now < '24 hours' or transac.timestamp|timesince:now < '60 minutes' %}
+                                                {% if transac.type  != 'PAYDUE' %}
+                                                    <input type="radio" name="TPK" value="{{ transac.id }}">
+                                                {% else %}
+                                                    <input type="radio" name="TPK" value="{{ transac.id }}" disabled>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -117,12 +163,13 @@
                             </div>
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
      </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
-        let a = document.getElementById('TDUE').innerHTML
+        let a = document.getElementById('TDUE').innerHTML;
         if (a <= 0){
             document.getElementById('DUE').style.display = 'none'
         }

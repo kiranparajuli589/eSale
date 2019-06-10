@@ -13,7 +13,8 @@ from dashboard.forms import (ItemUpdateForm, ItemAddForm,
                              VendorAddForm, VendorUpdateForm, VendorAddItemForm)
 
 from dashboard.models import (Item, Cart, Order, Transaction, CartItem, Customer, Vendor,
-                              TransactionStat, TransactionStatMonth, TransactionStatYear)
+                              TransactionStat, TransactionStatMonth, TransactionStatYear, SalesReturn, ReturnItems,
+                              PurchaseReturn)
 from accounts.models import Log
 from datetime import date, datetime
 
@@ -204,22 +205,22 @@ def cart_content_inv(request, pk):
             print('sale checked')
             if form.is_valid():
                 cart_qty = request.POST.getlist('cart_qty')
-                print(cart_qty)
                 i = 0
                 for c_i in cart_item:
                     ca, created = CartItem.objects.get_or_create(item=c_i, cart_id=cart.id)
                     ca.cart_qty = int(cart_qty[i])
+                    ca.return_qty = int(cart_qty[i])
                     i += 1
                     ca.save()
                 return redirect('cart-confirm', cart.id)
         elif 'purchase' in request.POST:
-            print('purchase checked')
             if form.is_valid():
                 cart_qty = request.POST.getlist('cart_qty')
                 i = 0
                 for c_i in cart_item:
                     ca, created = CartItem.objects.get_or_create(item=c_i, cart_id=cart.id)
                     ca.cart_qty = int(cart_qty[i])
+                    ca.return_qty = int(cart_qty[i])
                     i += 1
                     ca.save()
                 return redirect('cart-confirm-add-item', cart.id)
@@ -239,6 +240,7 @@ def cart_content(request, pk):
             for c_i in cart_item:
                 ca, created = CartItem.objects.get_or_create(item=c_i, cart_id=cart.id)
                 ca.cart_qty = int(cart_qty[i])
+                ca.return_qty = int(cart_qty[i])
                 i += 1
                 ca.save()
             if order.vendor:
@@ -360,8 +362,8 @@ def order_transaction(request, pk):
                     customer = Customer.objects.get(id=int(customer_pk))
 
                 except:
-                    customer, status = Customer.objects.get_or_create(f_name='Not', l_name='Registered',
-                                                                      email='others@xyz.com')
+                    customer, status = Customer.objects.get_or_create(f_name='Walking', l_name='Customer',
+                                                                      phone=54545454, email='others@xyz.com')
             else:
                 customer = order.customer
 
@@ -393,8 +395,8 @@ def order_transaction_two(request, pk):
                 try:
                     vendor = Vendor.objects.get(id=int(vendor_pk))
                 except:
-                    vendor, status = Vendor.objects.get_or_create(f_name='Not', l_name='Registered',
-                                                                  email='others@xyz.com')
+                    vendor, status = Vendor.objects.get_or_create(f_name='Walking', l_name='Vendor',
+                                                                      phone=54545454, email='others@xyz.com')
             else:
                 vendor = order.vendor
 
@@ -404,6 +406,11 @@ def order_transaction_two(request, pk):
             else:
                 form.instance.received = decimal.Decimal(received)
                 form.instance.due_amount = order.grand_total - form.instance.received
+
+            for ca in cart_item:
+                up_item = Item.objects.get(item_code=ca.item.item_code)
+                up_item.quantity += ca.cart_qty
+                up_item.save()
 
             form.instance.order = order
             form.instance.type = 'PURCHASE'
@@ -670,9 +677,15 @@ def customer_detail(request, pk):
             tot_items += tr.order.cart.quantity
             tot_received += tr.received
 
+    if request.method == "POST":
+        t_id = request.POST.get('TPK')
+
+        return redirect('sale-return', t_id)
     return render(request, 'dashboard/customer_detail.html', {'customer': customer,
                                                               'transacs': transac,
-                                                              't_item': tot_items,})
+                                                              't_item': tot_items,
+                                                              'now': now,
+                                                              })
 
 
 def start_sale(request, pk):
@@ -858,9 +871,15 @@ def vendor_detail(request, pk):
             tot_items += tr.order.cart.quantity
             tot_received += tr.received
 
+    if request.method == "POST":
+        t_id = request.POST.get('TPK')
+
+        return redirect('purchase-return', t_id)
+
     return render(request, 'dashboard/vendor_detail.html', {'vendor': vendor,
                                                             'transacs': transac,
-                                                            't_item': tot_items})
+                                                            't_item': tot_items,
+                                                            'now':now})
 
 
 @login_required()
@@ -901,7 +920,7 @@ def vendor_delete(request, pk):
     }
     return render(request, 'dashboard/vendor_delete.html', context)
 
-
+@login_required
 def make_transaction(request):
     it = Item.objects.all()
     items = Item.objects.all().values_list('item_code', 'item_name', 'quantity', 'buying_rate', 'selling_rate')
@@ -934,10 +953,9 @@ def make_transaction(request):
     }
     return render(request, 'dashboard/make_transaction.html', context)
 
-
+@login_required
 def populate_with_name(request):
     item_name = request.POST['item_name']
-    print(item_name)
     try:
         item = get_object_or_404(Item, item_name=item_name)
         test = 1
@@ -956,7 +974,7 @@ def populate_with_name(request):
         }
     return JsonResponse(data)
 
-
+@login_required
 def populate_with_id(request):
     id = request.GET.get('item_id')
     try:
@@ -977,7 +995,7 @@ def populate_with_id(request):
         }
     return JsonResponse(data)
 
-
+@login_required
 def populate_with_qty(request):
     qty = request.GET.get('item_qty')
     id = request.GET.get('item_id')
@@ -992,7 +1010,7 @@ def populate_with_qty(request):
     }
     return JsonResponse(data)
 
-
+@login_required
 def form_collect_make_transaction(request):
     if request.method == 'POST':
         form_dict = request.POST.dict()
@@ -1028,7 +1046,7 @@ def form_collect_make_transaction(request):
             for posn in idpos:
                 item = Item.objects.get(item_code=values[posn])
                 cart.item.add(item)
-                CartItem.objects.create(item=item, cart_id=cart.id, cart_qty=values[qtypos[a]])
+                CartItem.objects.create(item=item, cart_id=cart.id, cart_qty=values[qtypos[a]], return_qty=values[qtypos[a]])
                 if values[1] == '1':
                     item.quantity -= int(values[qtypos[a]])
                 else:
@@ -1138,7 +1156,7 @@ def form_collect_make_transaction(request):
     }
     return JsonResponse(data)
 
-
+@login_required
 def return_due(request):
     if request.method == 'FILES':
         customer = request.FILES['customer']
@@ -1197,7 +1215,7 @@ def import_export(request):
     context = {}
     return render(request, 'dashboard/import_export.html', context)
 
-
+@login_required
 def export_items_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="item_list.csv"'
@@ -1227,7 +1245,7 @@ def export_items_csv(request):
 
     return response
 
-
+@login_required
 def export_customer(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
@@ -1257,7 +1275,7 @@ def export_customer(request):
 
     return response
 
-
+@login_required
 def export_vendor(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
@@ -1286,3 +1304,213 @@ def export_vendor(request):
         writer.writerow(vendor)
 
     return response
+
+
+@login_required
+def purchase_return(request, pk):
+    transaction = Transaction.objects.get(id=pk)
+    cart_id = transaction.order.cart.id
+    cart_items = CartItem.objects.filter(cart_id=cart_id)
+
+    context = {
+        'transaction': transaction,
+        'cart_items': cart_items
+    }
+    return render(request, 'dashboard/purchase_return.html', context)
+
+@login_required()
+def sale_return(request, pk):
+    transaction = Transaction.objects.get(id=pk)
+    cart_id = transaction.order.cart.id
+    cart_items = CartItem.objects.filter(cart_id=cart_id)
+    print(cart_items)
+
+
+    context = {
+        'transaction': transaction,
+        'cart_items': cart_items
+    }
+    return render(request, 'dashboard/sale_return.html', context)
+
+
+def sale_return_ajax(request):
+    if request.method == "POST":
+        form_data = request.POST.dict()
+        approve = request.POST['accept']
+        print(approve)
+        t_id = request.POST['t_id']
+        transaction = Transaction.objects.get(id=t_id)
+        print(transaction.customer)
+        keys = []
+        values = []
+        for k, v in form_data.items():
+            if k.__contains__('name'):
+                keys.append(v)
+            elif k.__contains__('value'):
+                values.append(v)
+        del keys[0]
+        del values[0]
+        c = 0
+        for val in values:
+            if val == '':
+                c += 0
+            else:
+                c += int(val)
+        if c != 0:
+            print(keys)
+            print(values)
+            i = 0
+            total_return = 0
+            total_return_items = 0
+            for i in range(0, len(keys)):
+                item = Item.objects.get(item_code=keys[i])
+                if values[i] == '':
+                    remove_qty = 0
+                else:
+                    remove_qty = int(values[i])
+                return_amt = remove_qty * item.selling_rate
+                total_return += return_amt
+                total_return_items += remove_qty
+            data = {
+
+                'totalReturn': total_return,
+                'totalReturnItems': total_return_items,
+                'customerName': transaction.customer.get_customer_name(),
+                'cId': transaction.customer.id
+            }
+            if approve == "false":
+                print('hello')
+                data['message'] = 'unchecked'
+                return JsonResponse(data)
+            elif approve == 'true':
+                print('wow')
+                sr = SalesReturn.objects.create(customer=transaction.customer)
+                print(sr.id)
+                for i in range(0, len(keys)):
+                    item = Item.objects.get(item_code=keys[i])
+                    if values[i] == '':
+                        remove_qty = 0
+                    else:
+                        remove_qty = int(values[i])
+                        item.quantity += remove_qty
+                        item.save()
+                        ri = ReturnItems.objects.get_or_create(item=item, return_id=sr.id, qty=remove_qty)
+                        sr.item.add(item)
+                        sr.return_amount = total_return
+                        transaction.customer.tot_recved -= total_return
+                        transaction.customer.save()
+                        cart_id = transaction.order.cart.id
+                        c_item = CartItem.objects.get(cart_id=cart_id, item=item)
+                        c_item.return_qty -= remove_qty
+                        c_item.save()
+                        sr.save()
+                        messages.success(request, 'Sale return successfull!!!')
+                        data['message'] = 'success'
+                return JsonResponse(data)
+        else:
+            data = {
+                'message': 'empty'
+            }
+            return JsonResponse(data)
+
+
+
+
+def purchase_return_ajax(request):
+    if request.method == "POST":
+        form_data = request.POST.dict()
+        approve = request.POST['accept']
+        print(approve)
+        t_id = request.POST['t_id']
+        transaction = Transaction.objects.get(id=t_id)
+        print(transaction.vendor)
+        keys = []
+        values = []
+        for k, v in form_data.items():
+            if k.__contains__('name'):
+                keys.append(v)
+            elif k.__contains__('value'):
+                values.append(v)
+        del keys[0]
+        del values[0]
+        c = 0
+        for val in values:
+            if val == '':
+                c += 0
+            else:
+                c += int(val)
+        if c != 0:
+            print(keys)
+            print(values)
+            i = 0
+            total_return = 0
+            total_return_items = 0
+            for i in range(0, len(keys)):
+                item = Item.objects.get(item_code=keys[i])
+                if values[i] == '':
+                    remove_qty = 0
+                else:
+                    remove_qty = int(values[i])
+                return_amt = remove_qty * item.selling_rate
+                total_return += return_amt
+                total_return_items += remove_qty
+            data = {
+
+                'totalReturn': total_return,
+                'totalReturnItems': total_return_items,
+                'vendorName': transaction.vendor.get_vendor_name(),
+                'vId': transaction.vendor.id
+            }
+            if approve == "false":
+                print('hello')
+                data['message'] = 'unchecked'
+                return JsonResponse(data)
+            elif approve == 'true':
+                print('wow')
+                pr = PurchaseReturn.objects.create(vendor=transaction.vendor)
+                print(pr.id)
+                for i in range(0, len(keys)):
+                    item = Item.objects.get(item_code=keys[i])
+                    if values[i] == '':
+                        remove_qty = 0
+                    else:
+                        remove_qty = int(values[i])
+                        item.quantity -= remove_qty
+                        item.save()
+                        ri = ReturnItems.objects.get_or_create(item=item, return_id=pr.id, qty=remove_qty)
+                        pr.item.add(item)
+                        pr.return_amount = total_return
+                        transaction.vendor.tot_recved -= total_return
+                        transaction.vendor.save()
+                        cart_id = transaction.order.cart.id
+                        c_item = CartItem.objects.get(cart_id=cart_id, item=item)
+                        c_item.return_qty -= remove_qty
+                        c_item.save()
+                        pr.save()
+                        messages.success(request, 'Purchase return successfull!!!')
+                        data['message'] = 'success'
+                return JsonResponse(data)
+        else:
+            data = {
+                'message': 'empty'
+            }
+            return JsonResponse(data)
+
+
+
+
+@login_required()
+def check_date(request):
+    id = request.GET.get('transaction_id')
+    print(id)
+    transaction = Transaction.objects.get(id=id)
+    timestamp = (transaction.timestamp - now).total_seconds()
+    if timestamp/86400 < 7:
+        check = 'true'
+    else:
+        check = 'false'
+    data = {
+        'check': check
+    }
+    return JsonResponse(data)
+

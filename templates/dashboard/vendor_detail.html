@@ -4,33 +4,35 @@
      <div class="row">
             <div class="col-md-8 col-lg-offset-2">
                 <div class="card ">
-                    <div class="header">
-                        <div class="media-left">
-                            <img class="rounded-circle account-img" src="{{ vendor.image.url }}" style="width:150px">
-                        </div>
-                        <div class="media-body">
-                            <h3 class="account-heading">{{ vendor.get_vendor_name }}</h3>
-                            <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;  {{ vendor.address }}</p>
-                            <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ vendor.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
-                            <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ vendor.date_created }}</p>
-                        </div>
-                        <div class="media-bottom">
-                            <br>
-                            <div class="legend">
-                                <a class="btn btn-info" href="{% url 'vendor-update' vendor.id %}">Update</a>
-						        <a class="btn btn-danger" href="{% url 'vendor-delete' vendor.id %}">Remove</a>
-                                <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-vendor' vendor.id %}">PAY DUE</a>
-                                <a class="btn btn-lg btn-primary pull-right"
-                                   style="margin-top: -20px;"
-                                   href="{% url 'start-purchase' vendor.id %}">
-                                    START PURCHASE
-                                </a>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="header">
+                            <div class="media-left">
+                                <img class="rounded-circle account-img" src="{{ vendor.image.url }}" style="width:150px">
+                            </div>
+                            <div class="media-body">
+                                <h3 class="account-heading">{{ vendor.get_vendor_name }}</h3>
+                                <p class="text-secondary">Address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;  {{ vendor.address }}</p>
+                                <p class="text-secondary">Contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;{{ vendor.email }}&nbsp;&nbsp;{{ customer.phone }}</p>
+                                <p class="text-secondary">Date Created : &nbsp;&nbsp;&nbsp;{{ vendor.date_created }}</p>
+                            </div>
+                            <div class="media-bottom">
+                                <br>
+                                <div class="legend">
+                                    <a class="btn btn-info" href="{% url 'vendor-update' vendor.id %}">Update</a>
+                                    <a class="btn btn-danger" href="{% url 'vendor-delete' vendor.id %}">Remove</a>
+                                    <a id="DUE" class="btn btn-round btn-primary" href="{% url 'pay-due-vendor' vendor.id %}">PAY DUE</a>
+                                    <a class="btn btn-lg btn-primary pull-right"
+                                       style="margin-top: -20px;"
+                                       href="{% url 'start-purchase' vendor.id %}">
+                                        START PURCHASE
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="content">
+                        <div class="content">
                         <h4 class="text-center">TRANSACTION DETAILS</h4>
-						<div class="content table-responsive table-full-width">
+
                         <div class="content table-responsive table-full-width">
                             <table class="table table-striped">
                                 <tr>
@@ -47,6 +49,11 @@
                                 </tr>
                             </table>
                         </div>
+                        <button type="submit" class="btn btn-danger pull-right" style="font-size: 16px; margin-bottom: 20px;margin-right: 20px">
+                            PURCHASE RETURN
+                            <i class="pe-7s-back-2" style="font-size: xx-large"></i>
+                        </button>
+                        <div class="content table-responsive table-full-width">
 							<table class="table table-hover table-striped">
 								<thead style="background-color: #cbd5db">
                                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
@@ -55,6 +62,7 @@
                                     <td style="font-family: 'Noto Sans CJK SC Bold'">PAYMENT AMOUNT</td>
                                     <td style="font-family: 'Noto Sans CJK SC Bold'">DUE</td>
                                     <td style="font-family: 'Noto Sans CJK SC Bold'">DATETIME</td>
+                                    <td style="font-family: 'Noto Sans CJK SC Bold'" class="text-center">PURCHASE RETURN</td>
                                 </thead>
                                 <tbody>
                                     {% for transac in transacs %}
@@ -78,6 +86,15 @@
                                             <td>{{ transac.received }}</td>
                                             <td>{{ transac.due_amount }}</td>
                                             <td>{{ transac.timestamp|date }}</td>
+                                            <td class="text-center">
+                                                {% if transac.timestamp|timesince:now < "2 days" or transac.timestamp|timesince:now < '24 hours' or transac.timestamp|timesince:now < '60 minutes' %}
+                                                    {% if transac.type  != 'PAYDUE' %}
+                                                        <input type="radio" name="TPK" value="{{ transac.id }}">
+                                                    {% else %}
+                                                        <input type="radio" name="TPK" value="{{ transac.id }}" disabled>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                     {% endfor %}
 								</tbody>
@@ -90,6 +107,7 @@
                             </div>
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
      </div>

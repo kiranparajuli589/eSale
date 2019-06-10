@@ -28,6 +28,7 @@
         </div>
         <br>
         <div class="content table-responsive table-full-width" id="checkedTable">
+            <h3><i class="pe-7s-cart" style="font-size: xx-large"></i>Selected Item List:</h3>
             <table class="table">
                 <thead style="background-color: #2f3a4b; color: whitesmoke;">
                     <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
@@ -92,6 +93,11 @@
     </form>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
+
+        $(document).ready(function(){
+            $("#myTable tr:odd").addClass("odd");
+
+        });
         $("#checkedTable").hide();
         $(document).on('click', 'input[type="checkbox"]', function () {
             if ($(this).prop('checked') === true) {

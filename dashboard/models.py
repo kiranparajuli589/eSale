@@ -60,8 +60,8 @@ class Actor(models.Model):
     email = models.EmailField(unique=True, max_length=50, verbose_name='Email Address', blank=True, null=True)
     date_created = models.DateTimeField(default=now, verbose_name='Registered Date')
 
-    tot_due = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    tot_recved = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    tot_due = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    tot_recved = models.DecimalField(max_digits=20, decimal_places=2, default=0)
 
     class Meta:
         abstract = True
@@ -119,6 +119,7 @@ class CartItem(models.Model):
     cart_id = models.IntegerField(default=0)
     item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True, default=0)
     cart_qty = models.IntegerField(default=0)
+    return_qty = models.IntegerField(default=0)
     cart_amt = models.DecimalField(default=0, decimal_places=2, max_digits=10)
 
     def get_cart_buy_price(self):
@@ -209,3 +210,24 @@ class TransactionStatYear(models.Model):
     tot_items_sold = models.IntegerField(default=0)
     tot_items_purchased = models.IntegerField(default=0)
     year = models.CharField(max_length=10)
+
+
+class PurchaseReturn(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    item = models.ManyToManyField(Item, null=True, default=0)
+    return_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    timestamp = models.DateTimeField(default=now)
+
+
+class SalesReturn(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    item = models.ManyToManyField(Item, null=True, default=0)
+    return_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    timestamp = models.DateTimeField(default=now)
+
+
+
+class ReturnItems(models.Model):
+    item = models.ForeignKey(Item, null=True, default=0, on_delete=models.CASCADE)
+    return_id = models.CharField(max_length=20)
+    qty = models.IntegerField()

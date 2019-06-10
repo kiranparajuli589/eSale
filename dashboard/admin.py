@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from dashboard.models import (Item, Vendor, Customer, Cart, Order, Transaction, CartItem,
-                              Inventory, TransactionStat, TransactionStatMonth, TransactionStatYear)
+                              Inventory, TransactionStat, TransactionStatMonth, TransactionStatYear, SalesReturn,
+                              ReturnItems, PurchaseReturn)
 
 
 class ItemAdmin(admin.ModelAdmin):
@@ -53,11 +54,14 @@ admin.site.register(Item, ItemAdmin)
 admin.site.register(Vendor, VendorAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Cart)
-# admin.site.register(Order)
+admin.site.register(Order)
 admin.site.register(Transaction, TransactionAdmin)
-# admin.site.register(CartItem)
+admin.site.register(CartItem)
 admin.site.register(TransactionStat, TransactionStatAdmin)
 admin.site.register(TransactionStatMonth, TransactionStatMonthAdmin)
 admin.site.register(TransactionStatYear)
+admin.site.register(SalesReturn)
+admin.site.register(ReturnItems)
+admin.site.register(PurchaseReturn)
 
 

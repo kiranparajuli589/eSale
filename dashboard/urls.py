@@ -7,7 +7,8 @@ from .views import (index, inventory,
                     order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item, sale, start_sale,
                     start_purchase, make_transaction, populate_with_id, populate_with_qty,
                     form_collect_make_transaction, return_due, populate_with_name, transaction_delete,
-                    import_export, export_items_csv, test, cart_content_inv, export_customer, export_vendor)
+                    import_export, export_items_csv, test, cart_content_inv, export_customer, export_vendor,
+                    sale_return, check_date, sale_return_ajax, purchase_return, purchase_return_ajax)
 
 
 urlpatterns = [
@@ -47,6 +48,8 @@ urlpatterns = [
     path('export/csv/', export_items_csv, name='export_items_csv'),
     path('export/customer/', export_customer, name='export-customer'),
     path('export/vendor/', export_vendor, name='export-vendor'),
+    path('sale/return/<int:pk>/', sale_return, name='sale-return'),
+    path('purchase/return/<int:pk>/', purchase_return, name='purchase-return'),
     path('test/', test, name='test'),
 
     path('ajax/id/', populate_with_id, name='ajax-id'),
@@ -54,4 +57,7 @@ urlpatterns = [
     path('ajax/qty/', populate_with_qty, name='ajax-qty'),
     path('ajax/make/transaction/', form_collect_make_transaction, name='form-collect'),
     path('ajax/due/', return_due, name='ajax-due'),
+    path('ajax/sale/tid/', sale_return_ajax, name='ajax-form-item'),
+    path('ajax/purchase/tid/', purchase_return_ajax, name='ajax-purchase-return'),
+    path('ajax/check/', check_date, name='ajax-check')
 ]
