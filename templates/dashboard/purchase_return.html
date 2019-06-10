@@ -27,7 +27,7 @@
             }
         });
         $(document).on('click', '#submit', function (e) {
-            $("#acceptMeDiv").show(70);
+            $("#acceptMeDiv").show(200);
             let acceptMe = $("#acceptMe").prop('checked');
             let tID = $("#acceptMe").prop('value');
             console.log(tID);
@@ -60,7 +60,7 @@
                           {
                             scrollTop: $("#message").offset().top
                           },
-                          500 //speed
+                          1600 //speed
                         );
                         $("#message").fadeOut(2400);
                     }
@@ -71,7 +71,7 @@
                           {
                             scrollTop: $("#acceptMeDiv").offset().top
                           },
-                          500 //speed
+                          1600 //speed
                         );
                         $("#message2").fadeOut(2400);
                     }
@@ -170,7 +170,7 @@
                 <div style="font-size: xx-large">
                     <strong>TOTAL RETURN AMOUNT </strong>:<p id="totAmt" class="text-danger" style="font-size: xx-large"></p>
                 </div>
-                <div id="acceptMeDiv"  hidden>
+                <div id="acceptMeDiv"  hidden style="padding:20px">
                     <label for="acceptMe">Verify Return (Admin Use Only)</label><br>
                     <input style="transform: scale(2); margin: 0; padding:0;" type="checkbox" name="accept" id="acceptMe" class="text-center" value="{{ transaction.id }}">
                 </div>
