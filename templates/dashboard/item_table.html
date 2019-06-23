@@ -1,0 +1,107 @@
+<html>
+    <head>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+
+
+    </head>
+    <body>
+        <style>
+            select[name='example_length'] {
+                padding: 7px;
+                background: #f1f1f1;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(17, 18, 255, 0.5);
+            }
+            input[type='search'] {
+                margin: 0;
+                margin-bottom: 20px;
+                padding: 10px;
+                font-size: 17px;
+                border: 1px solid grey;
+                float: right;
+                width: 600px;
+                background: #f1f1f1;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(17, 18, 255, 0.5);
+            }
+            tbody .odd {
+                background-color: #cdddf7; }
+            tbody .odd td {
+                border-bottom: 1px solid #cef; }
+
+        </style>
+
+        <table class="table example" id="example">
+            <thead style="background-color: #335386; color: whitesmoke;">
+                    <tr>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Purchase Rate</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                        <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
+                    </tr>
+                </thead>
+            <tbody id="myTable">
+
+                    {% for item in items %}
+
+                        <tr>
+                            <td>{{ item.item_code}}</td>
+                            <td>
+                                <a id="item{{ forloop.counter }}" href="{% url 'item-detail' item.pk %}">
+                                    {{ item.item_name }}
+                                </a></td>
+                            {% if item.quantity < item.minimum_stock %}
+                                <td class="text-danger">
+                                    {{ item.quantity }}
+                                </td>
+                                {% else %}
+                                <td>
+                                    {{ item.quantity }}
+                                </td>
+                            {% endif %}
+                            <td>{{ item.buying_rate }}</td>
+                            <td>{{ item.selling_rate }}</td>
+                            <td>
+
+                                <label class="cont">
+                                    <input type="checkbox" value="{{ item.id }}" name="ItemPK" class="myCheckBox">
+                                    <span class="checkmark" style="left: 80px;"></span>
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            <tfoot style="background-color: #3b277d; color: whitesmoke;">
+                    <tr>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Purchase Rate</td>
+                        <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                        <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
+                    </tr>
+                </tfoot>
+        </table>
+
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script>
+            $(document).ready(function(){
+
+                $("#myTable tr:odd").addClass("odd");
+
+            });
+            $(document).ready(function() {
+                 $.noConflict();
+                let table = $('#example').DataTable();
+                $("input[type='search']").focus();
+            } );
+
+        </script>
+    </body>
+</html>

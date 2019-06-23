@@ -1,4 +1,6 @@
 from django.urls import path, include
+from rest_framework import routers
+
 from .views import (index, inventory,
                     item_detail, item_update, item_delete, add_item,
                     cart_confirm, cart_content, order_transaction, transaction_detail,
@@ -7,11 +9,24 @@ from .views import (index, inventory,
                     order_transaction_two, pay_due_customer, pay_due_vendor, cart_confirm_add_item, sale, start_sale,
                     start_purchase, make_transaction, populate_with_id, populate_with_qty,
                     form_collect_make_transaction, return_due, populate_with_name, transaction_delete,
-                    import_export, export_items_csv, test, cart_content_inv, export_customer, export_vendor,
-                    sale_return, check_date, sale_return_ajax, purchase_return, purchase_return_ajax)
+                    import_export, export_items_csv, cart_content_inv, export_customer, export_vendor,
+                    sale_return, check_date, sale_return_ajax, purchase_return, purchase_return_ajax, ItemViewSet,
+                    ajax_discount_form)
+
+
+router = routers.DefaultRouter()
+router.register(r'items', ItemViewSet)
+
+
+
+
 
 
 urlpatterns = [
+    path('api/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+
     path('db/stat/', index, name='dashboard'),
     path('', inventory, name='inventory'),
     path('item/add/', add_item, name='add-item'),
@@ -50,7 +65,6 @@ urlpatterns = [
     path('export/vendor/', export_vendor, name='export-vendor'),
     path('sale/return/<int:pk>/', sale_return, name='sale-return'),
     path('purchase/return/<int:pk>/', purchase_return, name='purchase-return'),
-    path('test/', test, name='test'),
 
     path('ajax/id/', populate_with_id, name='ajax-id'),
     path('ajax/name/', populate_with_name, name='ajax-name'),
@@ -59,5 +73,6 @@ urlpatterns = [
     path('ajax/due/', return_due, name='ajax-due'),
     path('ajax/sale/tid/', sale_return_ajax, name='ajax-form-item'),
     path('ajax/purchase/tid/', purchase_return_ajax, name='ajax-purchase-return'),
-    path('ajax/check/', check_date, name='ajax-check')
+    path('ajax/check/', check_date, name='ajax-check'),
+    path('ajax/discount/form', ajax_discount_form, name='ajax-discount-form')
 ]

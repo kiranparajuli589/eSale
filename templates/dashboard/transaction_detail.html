@@ -1,31 +1,36 @@
 {% extends 'dashboard/tran.html' %}
 
 {% block content %}
-             <div class="row">
-                    <div class="col-md-8 col-lg-offset-2">
+    <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
                         <div class="card ">
                             <div class="header">
-                                <h3 class="title">Transaction Detail</h3>
-                                <hr>
+                                <h2 class="title text-center" style="border-bottom: 2px solid darkmagenta">Transaction Detail</h2>
                                 {% if transac.customer.get_customer_name %}
-                                    <h4 class="simple-text">Customer Name : {{ transac.customer.get_customer_name }}</h4>
+                                    <h4 class="simple-text">Customer Name : <span style="font-weight: 500">{{ transac.customer.get_customer_name }}</span></h4>
                                 {% elif not transac.customer %}
-                                    <h4 class="simple-text">VENDOR NAME : {{ transac.vendor.get_vendor_name }}</h4>
+                                    <h4 class="simple-text">VENDOR NAME : <span style="font-weight: 500">{{ transac.vendor.get_vendor_name }}</span></h4>
                                 {% else %}
-                                    <h4 class="simple-text">ACTOR: NONE</h4>
+                                    <h4 class="simple-text">ACTOR: <span style="font-weight: 500">NONE</span></h4>
                                 {% endif %}
                             </div>
                             <div class="content" style="font-size: 16px">
                                 <div class="row">
-                                    <div class="col-md-5">Date : {{ transac.timestamp }}</div>
-                                    <div class="col-md-4">Received : {{ transac.received }}</div>
-                                    <div class="col-md-3">Due : {{ transac.due_amount }}</div>
+                                    <div class="col-md-6">
+                                        <h5>
+                                            Date :
+                                            <span style="font-weight: 400">{{ transac.timestamp }}</span>
+                                        </h5>
+                                    </div>
+
+
                                 </div><br>
                                 <div class="col-md-12 text-center text-danger">Transaction Type: {{ transac.type }}</div>
-                            <hr>
+                                <hr>
                                 {% if not transac.type == 'PAYDUE' %}
                                     <div class="row">
-                                        <div class="col-md-8 col-lg-offset-2 content table-responsive">
+                                        <div class=" card col-md-8 col-lg-offset-2 content table-responsive">
                                             <table class="table table-hover">
                                                 <thead style="background-color: #cbd5db">
                                                     <th>Item ID</th>
@@ -45,10 +50,16 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <div class="footer">
-                                    <div class="legend">
-                                        <i class="fa fa-circle text-info"></i> Update
-                                        <a href="{% url 'transaction-delete' transac.id %}"><i class="fa fa-circle text-danger"></i> Remove</a>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4><i class="fa fa-circle text-info"></i> Recieved:<span><b>{{ transac.received }}</b></span></h4>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h4><i class="fa fa-circle text-danger"></i> Due:<span><b>{{ transac.due_amount }}</b></span></h4>
+                                        </div>
+
+
                                     </div>
                                     <hr>
                                     <div class="stats">
@@ -58,4 +69,7 @@
                             </div>
                         </div>
                     </div>
+    <div class="col-md-2"></div>
+    </div>
+
 {% endblock %}

@@ -55,69 +55,67 @@
             -->
 
             <div class="sidebar-wrapper">
-                <div class="logo">
-                    <a href="{% url 'inventory' %}" class="simple-text">
-                        eSale
-                    </a>
-                </div>
-
-                <ul class="nav">
-                    <li>
-                        <a href="{% url 'inventory' %}">
-                            <i class="pe-7s-plugin"></i>
-                            <p>Inventory</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'dashboard' %}">
-                            <i class="pe-7s-graph"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'profile' %}">
-                            <i class="pe-7s-user"></i>
-                            <p>User Profile</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'customer' %}">
-                            <i class="pe-7s-users"></i>
-                            <p>Customer</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'vendor' %}">
-                            <i class="pe-7s-smile"></i>
-                            <p>Vendor</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'transaction-tab' %}">
-                            <i class="pe-7s-cash"></i>
-                            <p>Transactions</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'add-item' %}">
-                            <i class="pe-7s-plus"></i>
-                            <p>Add Item</p>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="{% url 'entry' %}">
-                            <i class="pe-7s-paper-plane"></i>
-                            <p>Add Entry</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'import-export' %}">
-                            <i class="pe-7s-diskette"></i>
-                            <p>Import/Export</p>
-                        </a>
-                    </li>
-                </ul>
+            <div class="logo">
+                <a href="{% url 'inventory' %}" class="simple-text">
+                    <i class="pe-7s-cart"></i>
+                    eSale
+                </a>
             </div>
+
+            <ul class="nav">
+                <li class="active">
+                    <a href="{% url 'inventory' %}">
+                        <i class="pe-7s-plugin"></i>
+                        <p>Inventory</p>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{% url 'customer' %}">
+                        <i class="pe-7s-users"></i>
+                        <p>Customer</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'vendor' %}">
+                        <i class="pe-7s-smile"></i>
+                        <p>Vendor</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'transaction-tab' %}">
+                        <i class="pe-7s-cash"></i>
+                        <p>Transactions</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'add-item' %}">
+                        <i class="pe-7s-plus"></i>
+                        <p>Add Item</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'entry' %}">
+                        <i class="pe-7s-paper-plane"></i>
+                        <p>Rapid Entry</p>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'profile' %}">
+                        <i class="pe-7s-user"></i>
+                        <p>User Profile</p>
+                    </a>
+                </li>
+{#                <li>#}
+{#                    <a href="{% url 'dashboard' %}">#}
+{#                        <i class="pe-7s-graph"></i>#}
+{#                        <p>Dashboard</p>#}
+{#                    </a>#}
+{#                </li>#}
+            </ul>
+    	</div>
         </div>
 
         <div class="main-panel">

@@ -14,7 +14,9 @@ payment_type = (
 trans_type = (
     ('PURCHASE', 'PURCHASE'),
     ('SALE', 'SALE'),
-    ('PAYDUE', 'PAYDUE')
+    ('PAYDUE', 'PAYDUE'),
+    # ('SALE-RETURN', 'SALE-RETURN'),
+    # ('PURCHASE-RETURN', 'PURCHASE-RETURN')
 )
 
 
@@ -129,6 +131,12 @@ class CartItem(models.Model):
         return self.cart_qty*self.item.selling_rate
 
 
+class ReturnItems(models.Model):
+    item = models.ForeignKey(Item, null=True, default=0, on_delete=models.CASCADE)
+    return_id = models.CharField(max_length=20)
+    qty = models.IntegerField()
+
+
 class Cart(models.Model):
     item = models.ManyToManyField(Item, null=True, default=0)
     quantity = models.IntegerField(null=True, blank=True)  # total quantity of items in cart
@@ -181,6 +189,15 @@ class Transaction(models.Model):
         ordering = ['-timestamp']
 
 
+return_type = (
+    ('SALE-RETURN', 'SALE-RETURN'),
+    ('PURCHASE-RETURN', 'PURCHASE-RETURN')
+)
+
+
+
+
+
 class TransactionStat(models.Model):
     tot_recvd = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     tot_payed = models.DecimalField(max_digits=8, decimal_places=2, default=0)
@@ -226,8 +243,15 @@ class SalesReturn(models.Model):
     timestamp = models.DateTimeField(default=now)
 
 
+class ReturnTransaction(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True, blank=True)
+    timestamp = models.DateTimeField(default=now)
+    return_amt = models.DecimalField(max_digits=8, decimal_places=2, default=0, blank=True)
+    type = models.CharField(max_length=10, choices=return_type, default='SALE-RETURN')
+    sale_return = models.ForeignKey(SalesReturn, on_delete=models.CASCADE, null=True, blank=True)
+    purchase_return = models.ForeignKey(PurchaseReturn, on_delete=models.CASCADE, null=True, blank=True)
 
-class ReturnItems(models.Model):
-    item = models.ForeignKey(Item, null=True, default=0, on_delete=models.CASCADE)
-    return_id = models.CharField(max_length=20)
-    qty = models.IntegerField()
+
+
+

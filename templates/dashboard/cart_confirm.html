@@ -1,6 +1,46 @@
 {% extends 'dashboard/inv.html' %}
 {% load crispy_forms_tags %}
 
+
+{% block script %}
+    <script>
+
+        //both fields cannot be filled
+        $(document).on('keypress', '#id_disc_per', function (e) {
+            $("#id_disc_amt").val('');
+        });
+
+        $(document).on('keypress', '#id_disc_amt', function (e) {
+            $("#id_disc_per").val('');
+        });
+
+        $(document).on('click', '#submit', function (e) {
+            console.log($(".discountForm").serializeArray());
+            oId = $("#oID").attr('value');
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: '{% url 'ajax-discount-form' %}',
+                data: {
+                    'form_data': $(".discountForm").serializeArray(),
+                    'order_id' : oId,
+                    'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log("discout here");
+                    console.log(data.discAmount);
+                    $('#da').html(data.discAmount);
+                    $('#gt').html(data.grandTotal);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
     <div class="card">
         <div class="header">
@@ -42,52 +82,57 @@
                         </tbody>
                     </table>
                 </div>
-        {% if form %}
                 <div class="row">
-                    <form class="form-inline" role="form" method="POST">
+                    <form class="discountForm" role="form" method="POST">
+                        <p id="oID" hidden value="{{ order.id }}"></p>
                         {% csrf_token %}
                         <hr style="height: 1px; background-color: #dddddd">
-                        <div class="col-md-3 col-lg-offset-1" style="padding-left: 50px">
-                            <h2 style="padding-top: 25px"><i class="pe-7s-gift"></i> Discount:</h2>
-                        </div>
-                        <div class="col-md-5 card text-right" style="background-color: #2009c11f">
-{#                            <div class="input-group">#}
-                                <label for="{{ form.disc_per.id_for_label }}" style="font-size: 16px; padding-top: 20px; padding-right: 15px">DISCOUNT PERCENTAGE(%)</label>
+                        <div class="col-md-5 card" style="padding: 10px; margin: 10px;">
+{#                            # margin-left: 80px">#}
+                            <h2 class="text-center" style="border-bottom: 2px solid darkred"><i class="pe-7s-gift"></i> Discount:</h2>
 
-{#                                <span class="input-group-addon" style="background-color: #a9bdfc; border-color: #a9bdfc; height: 40px; padding: 0px; box-sizing: border-box">PERCENTAGE %</span>#}
+                            <div class="text-right">
+                                <label for="{{ form.disc_per.id_for_label }}" style="font-size: 16px">
+                                    DISCOUNT PERCENTAGE(%)
+                                </label>
+
                                 <input class="form-control" type="number" placeholder="%%%"
-                                       name="disc_per" step="0.01" id="id_disc_per" autocomplete="off" min="0" max="100">
-{#                            </div>#}
-{#                            <div class="input-group">#}
-                                <label for="{{ form.disc_amt.id_for_label }}" style="font-size: 16px; padding-top: 20px; padding-right: 10px">DISCOUNT AMOUNT </label>
-{#                                <span class="input-group-addon" style="background-color: #a9bdfc; border-color: #a9bdfc;">#}
-{#                                    AMOUNT</span>#}
-                                <input type="number" name="disc_amt" step="0.01" id="id_disc_amt" class="form-control"
+                                       name="disc_per" step="0.01" id="id_disc_per"
+                                       autocomplete="off" min="0" max="100">
+                                <label for="{{ form.disc_amt.id_for_label }}" style="font-size: 16px; margin: 7px 0 7px 0">
+                                    DISCOUNT AMOUNT
+                                </label>
+                                <input type="number" name="disc_amt" step="0.01"
+                                       id="id_disc_amt" class="form-control"
                                        placeholder="Amount" min="0" max="{{ order.tot_sale_price }}">
-{#                            </div>#}
                             <br><br>
-                            <button class="btn btn-primary text-right" type="submit">Add Discount</button>
+                            <button id='submit' class="btn btn-primary text-right" type="submit">Add Discount</button>
                         </div>
+                        </div>
+                        <div class="col-md-5 card" style="padding: 10px; margin: 10px">
+                            <h2 class="text-center" style="border-bottom: 2px solid darkred"><i class="pe-7s-settings"></i> Summary:</h2>
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <h3>Gross Total</h3>
+                                    <h4><b>{{ order.tot_sale_price }}</b></h4>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h3>Discount Amount</h3>
+                                    <h4 id="da" class="text-success"><b>{{ order.disc_amt }}</b></h4>
+                                </div> entry
+
+                                <div class="col-md-4">
+                                    <h3 style="font-size: xx-large; font-weight: bold">Grand Total</h3>
+                                    <h4 id='gt' class="text-danger" style="font-size: xx-large; font-weight: bold">{{ order.grand_total }}</h4>
+                                </div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
-        {% endif %}
                 <hr  style="height: 1px; background-color: #dddddd;" class="row">
-                <div class="table-responsive table-full-width text-right">
-                    <table class="table table-striped table-condensed">
-                        <thead>
-                        <td style="font-size: large"><b>Discount Amount</b></td>
-                        <td style="font-size: xx-large"><b>Grand Total</b></td>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="" style="font-size: large">{{ order.disc_amt }}</td>
-                                <td class="text-danger" style="font-size: xx-large">
-                                    {{ order.grand_total }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+
             <div class="footer">
                 {# # TODO place modal close button #}
                 <div class="legend">

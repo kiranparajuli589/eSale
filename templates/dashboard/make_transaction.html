@@ -37,7 +37,7 @@
 
         });
 
-        $(document).on('change', ".NAME",  function(){
+        $(document).on('blur', ".NAME",  function(){
                let itemName = $(this).val();
                console.log(itemName);
                let id = $(this).parent().parent().attr("id");
@@ -231,7 +231,7 @@
 
 
         {#item_code#}
-        $(document).on('change','.test', function (e) {
+        $(document).on('blur','.test', function (e) {
             var itemId = $(this).val();
             var id = $(this).parent().parent().attr("id");
             console.log(id);
@@ -272,7 +272,7 @@
             });
         });
         {#quantity#}
-        $(document).on('change', '.test0', function () {
+        $(document).on('blur', '.test0', function () {
             var qty = $(this).val();
             var id = ($(this).parent().parent().attr("id"));
             var itemId = $("#"+id).find('.test').val();
@@ -322,29 +322,80 @@
             var newAmt = totAmt-discAmt;
             $("#TOTR").val(newAmt);
         });
-        $(document).on('change', '#CUST', function(){
+        $(document).on('blur', '#CUST', function(){
             $("#VEND").val("");
             customer = $("#CUST").val();
+            console.log(customer);
             $.ajax({
                 type: 'POST',
                 url: '{% url 'ajax-due' %}',
                 data: {
                     'customer': customer,
+                    'vendor': null,
                     'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
                 },
                 dataType: 'json',
                 success: function (data) {
-                    $("#DT").val(data.customerDue);
+                    if (data.customerDue != 'Invalid') {
+                        $("#submit").removeAttr("disabled", "disabled");
+                        $("#DT").val(data.customerDue);
+                        if (data.customerDue<=0 && $("#t_type").val()==3) {
+                            $("#submit").attr("disabled", "disabled");
+                        }
+                    } else {
+
+                        $('<div class="text-danger">Invalid Input Not Allowed!</div>')
+                        .insertAfter('#CUST')
+                        .delay(500)
+                        .fadeOut(function() {
+                            $("#CUST").val("");
+                            $(this).remove();
+                        });
+                    }
 
                 }
             });
         });
-        $(document).on('change', '#VEND', function(){
+        $(document).on('blur', '#VEND', function(){
             $("#CUST").val("");
+            vendor = $("#VEND").val();
+            console.log(vendor);
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'ajax-due' %}',
+                data: {
+                    'vendor': vendor,
+                    'customer': null,
+                    'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.vendorDue != 'Invalid') {
+                        $("#submit").removeAttr("disabled", "disabled");
+                        $("#DT").val(data.vendorDue);
+                        if (data.vendorDue<=0 && $("#t_type").val()==3) {
+                            $("#submit").attr("disabled", "disabled");
+                        }
+                    } else {
+                        $('<div class="text-danger">Invalid Input Not Allowed!</div>')
+                        .insertAfter('#VEND')
+                        .delay(500)
+                        .fadeOut(function() {
+                            $("#VEND").val("");
+                            $(this).remove();
+                        });
+                    }
+
+                }
+            });
+
+
+
+
         });
         $(document).on('click', '#submit', function () {
             var formData = $(".transaction-entry-form").serializeArray();
-            {#console.log(itemData);#}
+
             $.ajax({
                 type: "POST",
                 url: '{% url 'form-collect' %}',
@@ -357,8 +408,18 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                  {#$(".transaction-entry-form").trigger("reset");#}
                   console.log(data.message);
+                  if (data.message === 'success') {
+                      $("#message").html('Transaction sucessfully created!!');
+                      $("#message").show();
+                      $("body,html").animate(
+                          {
+                            scrollTop: $("#message").offset().top
+                          },
+                          1000 //speed
+                      );
+                      $("#message").fadeOut(2400);
+                    }
                 },
                 error: function (error) {
                     console.log(error);
@@ -369,7 +430,18 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid" style="background-color: #d0e9c6">
+{#    <p id="message" style="padding: 8px; color: #ffffff; background-color: red; width: 100%" hidden></p>#}
+    <p id="message" style="background-image: linear-gradient(to right, darkred, red); color: white; padding:10px; font-size: 15px;" hidden></p>
+    <div class="container-fluid main" style="background-color: #d0e9c6">
+
+        <style>
+            label {
+                font-weight: 500;
+                font-size: 14px;
+            }
+        </style>
+
+
         <div class="header" style="font-size: xx-large">Entry</div>
         <div class="content">
             <form class="transaction-entry-form" method="POST" autocomplete="off">
@@ -394,6 +466,7 @@
                         <label>Item Name<input id="NAME" class="NAME Input-text" type="text" required name="name"></label>
                         <label>Available<input id="aQTY" class="Input-text" type="text" disabled></label>
                         <label>Unit Price<input id="UP" class="Input-text" type="text" disabled></label>
+                        <label>Quantity<input id="QTY" type="number" class="test0 Input-text" name="qty"></label>
                         <label>Total<input id="tot1" class="test1 Input-text" readonly="readonly" type="text" name="tot1"></label>
 
                     </div>

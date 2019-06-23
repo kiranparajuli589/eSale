@@ -2,18 +2,65 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="col-lg-offset-2 col-md-6" style="padding-left: 80px">
-        <form method="POST" enctype="multipart/form-data">
-            <h3>Add Item</h3><hr size="7">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend>Item Details</legend>
-                {{ form|crispy }}
-            </fieldset>
 
-            <div class="form-group">
-                <button class="btn btn-primary" type="submit">Add</button>
-            </div>
-        </form>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-5">
+                <h2>Add Item Here</h2><hr size="7">
+                <h3 id="clickMe" style="border-bottom:1px dashed #0a2355">Item import & export</h3>
+                <div class="text-center" id="import" hidden>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="file-field">
+                                <div class="btn BTN-FILE btn-sm float-left text-center" >
+                                  <span>Choose file</span>
+                                  <input required type="file" name="myFile" id="file"
+                                         style="
+                                            font-size: 17px;
+                                            color: #ff4a55;">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group text-center">
+                                <button name="itemSubmit" type="submit" class="btn btn-primary btn-lg" style="font-size: 22px; padding-right:40px;">
+                                    <i class="pe-7s-upload" style="font-size: 26px"></i>
+                                    Upload
+                                </button>
+                                <a href="{% url 'export_items_csv' %}" class="btn btn-danger btn-lg" style="font-size: 22px; padding-right:40px;">
+                                    <i class="pe-7s-download" style="font-size: 26px"></i>
+                                    Export
+                                </a>
+                            </div>
+                        </form>
+
+                </div>
+
+
+                <form method="POST" enctype="multipart/form-data">
+
+
+
+
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+                        <h3 style="border-bottom:2px solid #0a2355">Item Details</h3>
+                        {{ form|crispy }}
+                    </fieldset>
+
+                    <div class="form-group">
+                        <button name="addItem" class="btn btn-primary" type="submit">Add</button>
+                    </div>
+                </form>
+                <hr style="color:darkred">
+        </div>
+
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).on('click', '#clickMe', function () {
+            $("#import").slideToggle();
+        })
+    </script>
+
 {% endblock %}

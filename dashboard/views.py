@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.safestring import mark_safe
+from rest_framework import viewsets
 
 from dashboard.forms import (ItemUpdateForm, ItemAddForm,
                              CartInfo, AddToCartCheckBox, DiscountForm, TransactionForm,
@@ -14,10 +15,11 @@ from dashboard.forms import (ItemUpdateForm, ItemAddForm,
 
 from dashboard.models import (Item, Cart, Order, Transaction, CartItem, Customer, Vendor,
                               TransactionStat, TransactionStatMonth, TransactionStatYear, SalesReturn, ReturnItems,
-                              PurchaseReturn)
+                              PurchaseReturn, ReturnTransaction)
 from accounts.models import Log
 from datetime import date, datetime
 
+from dashboard.serializers import ItemSerializer
 
 ktm = pytz.timezone('Asia/Kathmandu')
 now = ktm.localize(datetime.now())
@@ -25,32 +27,12 @@ day = now.strftime("%A")
 month = now.strftime("%B")
 
 
-
-
-
-
-def test(request):
-    items = Item.objects.all().order_by('-id')
-    form = AddToCartCheckBox(request.POST)
-
-    if request.method == 'POST':
-        if form.is_valid():
-            sel_id = request.POST.getlist('ItemPK')
-            cart = Cart(quantity=0)
-            cart.save()
-            for selected in sel_id:
-                item = Item.objects.get(id=selected)
-                cart.item.add(item)
-
-            order = Order.objects.create(cart=cart)
-            return redirect('cart-content', cart.id)
-
-    return render(request, 'dashboard/test.html', {'user': request.user,
-                                                        'items': items, })
-
-
-
-
+class ItemViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Item.objects.all().order_by('id')
+    serializer_class = ItemSerializer
 
 
 @login_required
@@ -273,33 +255,11 @@ def cart_confirm(request, pk):
     order.save()
     cart.save()
 
-    form = DiscountForm(request.POST)
-
-    if request.method == "POST":
-        if form.is_valid():
-            disc_per = form.cleaned_data.get('disc_per')
-            disc_amt = form.cleaned_data.get('disc_amt')
-            if disc_per and disc_amt:
-                messages.warning(request, "[Error]Both Discount Field Configured!!")
-                return redirect('cart-confirm', cart.id)
-            if disc_per:
-                amt = disc_per/100*order.tot_sale_price
-                order.disc_amt = amt
-                order.grand_total = order.get_gt_amt()
-                order.save()
-            if disc_amt:
-                order.disc_amt = disc_amt
-                order.grand_total = order.get_gt_amt()
-                order.save()
-            return render(request, 'dashboard/cart_confirm.html', {'carts': cart,
-                                                                   'form': form,
-                                                                   'order': order,
-                                                                   'cart_items': cart_item})
-
     return render(request, 'dashboard/cart_confirm.html', {'carts': cart,
-                                                           'form': form,
                                                            'order': order,
                                                            'cart_items': cart_item})
+
+
 
 
 
@@ -320,6 +280,7 @@ def cart_confirm_add_item(request, pk):
         tsp += c_i.get_cart_sale_price()
 
     cart.quantity = tqty
+    print(cart.quantity)
     order.tot_buy_price = tbp
     order.tot_sale_price = tsp
     order.grand_total = tbp
@@ -426,6 +387,7 @@ def order_transaction_two(request, pk):
             return redirect('inventory')
 
     return render(request, 'dashboard/add_transaction_2.html', {'form': form,
+                                                                'cart_items': cart_item,
                                                                 'order': order,
                                                                 'transac': form.instance})
 
@@ -455,51 +417,95 @@ def add_item(request):
         if user.is_admin:
             form = ItemAddForm(request.POST,
                                request.FILES)
-            if form.is_valid():
-                item_code = form.cleaned_data.get('item_code')
-                item = form.cleaned_data.get('item_name')
-                buying_rate = form.cleaned_data.get('buying_rate')
-                sale_rate = form.cleaned_data.get('selling_rate')
-                purchase_qty = form.cleaned_data.get('quantity')
+        prompt = {
+            'order': 'Order of the CSV should be id(leave all blank), item_code, item_name, quantity, buying_rate, selling_rate, minimum_stock, location_in_store, description'
+        }
 
-                #  total amount/purchase-amount/quantity for cart and order
-                amt = float(purchase_qty)*float(buying_rate)
-                samt = float(purchase_qty)*float(sale_rate)
+        if request.method == "GET":
+            return render(request, 'dashboard/import_export.html', prompt)
 
-                if Item.objects.filter(item_code=item_code) or Item.objects.filter(item_name=item):
-                    form.instance.quantity += int(purchase_qty)
-                    messages.success(request, "Item Updated Successfully!")
+        if 'itemSubmit' in request.POST:
+            csv_item_file = request.FILES['myFile']
+
+            if not csv_item_file.name.endswith('.csv'):
+                messages.error(request, 'This is no CSV file!!')
+
+            data_set = csv_item_file.read().decode('UTF-8')
+            to_string = io.StringIO(data_set)
+            next(to_string)
+            for column in csv.reader(to_string, delimiter=',', quotechar='|'):
+                obj, created = Item.objects.get_or_create(
+                    item_code=column[0],
+                    item_name=column[1],
+                )
+                print(decimal.Decimal(column[3]))
+                obj.buying_rate = decimal.Decimal(column[3])
+                obj.selling_rate = decimal.Decimal(column[4])
+                obj.minimum_stock = int(column[5])
+                obj.location_in_store = column[6]
+                obj.description = column[7]
+                if created:
+                    obj.quantity = column[2]
                 else:
-                    messages.success(request,
-                                     str(purchase_qty) + ' ' + str(item) + '`s ' + 'has been created successfully!!! ')
+                    obj.quantity += int(column[2])
+                obj.save()
+            messages.success(request, 'File Import Successfull!!!')
 
-                form.save()  # item added to db
-                item = Item.objects.get(item_name=item)
 
-                cart = Cart(quantity=purchase_qty)  # cart created for form instance
-                cart.save()
-                cart.item.add(item)
+        if 'addItem' in request.POST:
 
-                cart_item = CartItem.objects.create(cart_id=cart.id, item=item,
-                                                    cart_qty=purchase_qty, cart_amt=amt)
-                order = Order.objects.create(cart=cart,
-                                             tot_buy_price=amt,
-                                             tot_sale_price=samt,
-                                             grand_total=amt)
-                Log.objects.create(user=request.user,
-                                   subject="Add Item",
-                                   detail='Item Name:' + str(item) + ' Quantity :' + str(purchase_qty) + '\n'
-                                          + 'Buying Rate: ' + str(buying_rate) + ' Selling Rate: ' + str(sale_rate))
-                return redirect('cart-confirm-add-item', cart.id)
 
-        else:
-            messages.warning(request, 'Permission Denied!!')
-            return redirect('inventory')
+            if form.is_valid():
+                    item_code = form.cleaned_data.get('item_code')
+                    item = form.cleaned_data.get('item_name')
+                    buying_rate = form.cleaned_data.get('buying_rate')
+                    sale_rate = form.cleaned_data.get('selling_rate')
+                    purchase_qty = form.cleaned_data.get('quantity')
+                    print(purchase_qty)
+                    #  total amount/purchase-amount/quantity for cart and order
+                    amt = float(purchase_qty)*float(buying_rate)
+                    samt = float(purchase_qty)*float(sale_rate)
+
+                    if Item.objects.filter(item_code=item_code) or Item.objects.filter(item_name=item):
+                        form.instance.quantity += int(purchase_qty)
+                        messages.success(request, "Item Updated Successfully!")
+                    else:
+                        messages.success(request,
+                                         str(purchase_qty) + ' ' + str(item) + '`s ' + 'has been created successfully!!! ')
+
+                    form.save()  # item added to db
+                    item = Item.objects.get(item_name=item)
+                    print(item.item_name);
+                    print(item.quantity);
+
+                    cart = Cart(quantity=purchase_qty)  # cart created for form instance
+                    cart.save()
+                    cart.item.add(item)
+
+                    cart_item = CartItem.objects.create(cart_id=cart.id, item=item,
+                                                        cart_qty=purchase_qty, cart_amt=amt)
+                    order = Order.objects.create(cart=cart,
+                                                 tot_buy_price=amt,
+                                                 tot_sale_price=samt,
+                                                 grand_total=amt)
+                    Log.objects.create(user=request.user,
+                                       subject="Add Item",
+                                       detail='Item Name:' + str(item) + ' Quantity :' + str(purchase_qty) + '\n'
+                                              + 'Buying Rate: ' + str(buying_rate) + ' Selling Rate: ' + str(sale_rate))
+                    return redirect('inventory')
+
+            else:
+                messages.warning(request, 'Permission Denied!!')
+                return redirect('inventory')
+
+        context = {
+            'form':form
+        }
     else:
         form = ItemAddForm()
-    context = {
-        'form': form,
-    }
+        context = {
+            'form': form,
+        }
     return render(request, 'dashboard/add_item.html', context)
 
 
@@ -1025,7 +1031,6 @@ def form_collect_make_transaction(request):
         if tot_items == '':
             tot_items = 0
 
-
         keys = []
         values = []
         b = 1
@@ -1034,18 +1039,21 @@ def form_collect_make_transaction(request):
                 keys.append(v)
             elif k.__contains__('value'):
                 values.append(v)
+
         print(keys)
         print(values)
+
         if values[1] == '1' or values[1] == '2':                    #SALES
             idpos = [id_pos for id_pos, x in enumerate(keys) if x == 'id']
             qtypos = [qty_pos for qty_pos, x in enumerate(keys) if x == 'qty']
             cart = Cart(quantity=tot_items)
             cart.save()
-
+            print(qtypos)
             a = 0
             for posn in idpos:
                 item = Item.objects.get(item_code=values[posn])
                 cart.item.add(item)
+
                 CartItem.objects.create(item=item, cart_id=cart.id, cart_qty=values[qtypos[a]], return_qty=values[qtypos[a]])
                 if values[1] == '1':
                     item.quantity -= int(values[qtypos[a]])
@@ -1086,6 +1094,10 @@ def form_collect_make_transaction(request):
                 due = order.grand_total - recieved
                 customer.tot_due += due
                 customer.tot_recved += recieved
+                customer.save()
+                data = {
+                    'message': 'success'
+                }
             else:
                 order = Order.objects.create(cart=cart,
                                              tot_buy_price=decimal.Decimal(tot_amt),
@@ -1103,6 +1115,10 @@ def form_collect_make_transaction(request):
                 due = order.grand_total - recieved
                 vendor.tot_due += due
                 vendor.tot_recved += recieved
+                vendor.save()
+                data = {
+                    'message': 'success'
+                }
 
             discperposn = keys.index('disc_per')
             discamtposn = keys.index('disc_amt')
@@ -1121,9 +1137,13 @@ def form_collect_make_transaction(request):
             transaction.due_amount = due
             transaction.payment_type = payment_type
             transaction.save()
+            data = {
+                'message': 'success'
+            }
 
         elif values[1] == '3':                #PAY_DUE
             p_amt = decimal.Decimal(values[11])
+            print(p_amt)
             cust = values[8]
             if not cust or cust == '':
                 customer = None
@@ -1133,10 +1153,11 @@ def form_collect_make_transaction(request):
                 if customer.tot_due > 0:
                     customer.tot_due -= p_amt
                     customer.tot_recved += p_amt
-                    Transaction.objects.create(customer=customer,
-                                               due_amount=customer.tot_due, type='PAYDUE',
-                                               recieved=p_amt, payment_type='CASH')
                     customer.save()
+                    Transaction.objects.create(customer=customer, order=None,
+                                               due_amount=customer.tot_due, type='PAYDUE',
+                                               received=p_amt, payment_type='CASH')
+
             vend = values[9]
             if not vend or vend == '':
                 vendor = None
@@ -1147,32 +1168,61 @@ def form_collect_make_transaction(request):
                     vendor.tot_due -= p_amt
                     vendor.tot_recved += p_amt
                     vendor.save()
-                    Transaction.objects.create(type="PAYDUE", payment_type="CASH", received=p_amt, due_amount=vendor.tot_due,
-                                               vendor=vendor,
-                                               order=None)
-        print("----------------------------------------")
+                    Transaction.objects.create(type="PAYDUE", payment_type="CASH",
+                                               received=p_amt, due_amount=vendor.tot_due,
+                                               vendor=vendor, order=None)
+
+    print("----------------------------------------")
     data = {
-        'message': 'Mission Successful'
+        'message': 'success'
     }
     return JsonResponse(data)
 
 @login_required
 def return_due(request):
-    if request.method == 'FILES':
-        customer = request.FILES['customer']
-        if customer or customer != '':
-            customer_name = customer.split()
-            cust = Customer.objects.get(f_name=customer_name[0],
-                                        l_name=customer_name[1])
-            data = {
-                'customerDue': cust.tot_due
-            }
+    if request.method == 'POST':
+        customer = request.POST['customer']
+        vendor = request.POST['vendor']
+        print(vendor)
+        print(customer)
+        if not vendor and customer and customer != '':
+
+            try:
+                customer_name = customer.split()
+                cust = Customer.objects.get(f_name=customer_name[0],
+                                            l_name=customer_name[1])
+                data = {
+                    'customerDue': cust.tot_due
+                }
+
+            except:
+                print('iamhere')
+                data = {
+                    'customerDue': 'Invalid'
+                }
+
+            return JsonResponse(data)
+        elif not customer and vendor and vendor != "":
+            try:
+                vendor_name = vendor.split()
+                ven = Vendor.objects.get(f_name=vendor_name[0],
+                                            l_name=vendor_name[1])
+                data = {
+                    'vendorDue': ven.tot_due
+                }
+
+            except:
+                print('iamhere')
+                data = {
+                    'vendorDue': 'Invalid'
+                }
+
             return JsonResponse(data)
         else:
             data = {
-                'customerDue': 'Invalid Data'
+                'customerDue': 'Invalid'
             }
-            return JsonResponse
+            return JsonResponse(data)
 
 
 @login_required()
@@ -1337,10 +1387,8 @@ def sale_return_ajax(request):
     if request.method == "POST":
         form_data = request.POST.dict()
         approve = request.POST['accept']
-        print(approve)
         t_id = request.POST['t_id']
         transaction = Transaction.objects.get(id=t_id)
-        print(transaction.customer)
         keys = []
         values = []
         for k, v in form_data.items():
@@ -1357,13 +1405,13 @@ def sale_return_ajax(request):
             else:
                 c += int(val)
         if c != 0:
-            print(keys)
-            print(values)
+            count = len(values)
             i = 0
             total_return = 0
             total_return_items = 0
-            for i in range(0, len(keys)):
+            for i in range(0, count-1):
                 item = Item.objects.get(item_code=keys[i])
+                print(item)
                 if values[i] == '':
                     remove_qty = 0
                 else:
@@ -1371,22 +1419,29 @@ def sale_return_ajax(request):
                 return_amt = remove_qty * item.selling_rate
                 total_return += return_amt
                 total_return_items += remove_qty
+            input_return = values[-1]
+            if input_return == '':
+                input_return_amount = 0
+            else:
+                input_return_amount = int(input_return)
+
             data = {
 
                 'totalReturn': total_return,
+                'inputReturn': input_return_amount,
                 'totalReturnItems': total_return_items,
                 'customerName': transaction.customer.get_customer_name(),
                 'cId': transaction.customer.id
             }
             if approve == "false":
-                print('hello')
                 data['message'] = 'unchecked'
                 return JsonResponse(data)
+            elif input_return == '':
+                data['message'] = 'input_empty'
+                return JsonResponse(data)
             elif approve == 'true':
-                print('wow')
                 sr = SalesReturn.objects.create(customer=transaction.customer)
-                print(sr.id)
-                for i in range(0, len(keys)):
+                for i in range(0, len(keys)-1):
                     item = Item.objects.get(item_code=keys[i])
                     if values[i] == '':
                         remove_qty = 0
@@ -1396,15 +1451,24 @@ def sale_return_ajax(request):
                         item.save()
                         ri = ReturnItems.objects.get_or_create(item=item, return_id=sr.id, qty=remove_qty)
                         sr.item.add(item)
-                        sr.return_amount = total_return
-                        transaction.customer.tot_recved -= total_return
+                        sr.return_amount = input_return_amount
+                        # if transaction.received < input_return_amount:
+                        #     messages.warning(request, 'Recieved is less than to be returned!!!')
+                        transaction.customer.tot_recved -= input_return_amount
                         transaction.customer.save()
                         cart_id = transaction.order.cart.id
                         c_item = CartItem.objects.get(cart_id=cart_id, item=item)
                         c_item.return_qty -= remove_qty
                         c_item.save()
                         sr.save()
-                        messages.success(request, 'Sale return successfull!!!')
+                        ReturnTransaction.objects.create(
+                            customer=transaction.customer,
+                            vendor=None,
+                            return_amt=input_return_amount,
+                            type='SALE-RETURN',
+                            sale_return=sr,
+                            purchase_return=None
+                        )
                         data['message'] = 'success'
                 return JsonResponse(data)
         else:
@@ -1414,16 +1478,12 @@ def sale_return_ajax(request):
             return JsonResponse(data)
 
 
-
-
 def purchase_return_ajax(request):
     if request.method == "POST":
         form_data = request.POST.dict()
         approve = request.POST['accept']
-        print(approve)
         t_id = request.POST['t_id']
         transaction = Transaction.objects.get(id=t_id)
-        print(transaction.vendor)
         keys = []
         values = []
         for k, v in form_data.items():
@@ -1445,31 +1505,39 @@ def purchase_return_ajax(request):
             i = 0
             total_return = 0
             total_return_items = 0
-            for i in range(0, len(keys)):
+            for i in range(0, len(keys)-1):
                 item = Item.objects.get(item_code=keys[i])
                 if values[i] == '':
                     remove_qty = 0
                 else:
                     remove_qty = int(values[i])
-                return_amt = remove_qty * item.selling_rate
+                return_amt = remove_qty * item.buying_rate
                 total_return += return_amt
                 total_return_items += remove_qty
+                input_return = values[-1]
+                if input_return == '':
+                    input_return_amount = 0
+                else:
+                    input_return_amount = int(input_return)
+
             data = {
 
                 'totalReturn': total_return,
+                'inputReturn': input_return_amount,
                 'totalReturnItems': total_return_items,
                 'vendorName': transaction.vendor.get_vendor_name(),
                 'vId': transaction.vendor.id
             }
             if approve == "false":
-                print('hello')
                 data['message'] = 'unchecked'
+                return JsonResponse(data)
+            elif input_return == '':
+                data['message'] = 'input_empty'
                 return JsonResponse(data)
             elif approve == 'true':
                 print('wow')
                 pr = PurchaseReturn.objects.create(vendor=transaction.vendor)
-                print(pr.id)
-                for i in range(0, len(keys)):
+                for i in range(0, len(keys)-1):
                     item = Item.objects.get(item_code=keys[i])
                     if values[i] == '':
                         remove_qty = 0
@@ -1479,15 +1547,24 @@ def purchase_return_ajax(request):
                         item.save()
                         ri = ReturnItems.objects.get_or_create(item=item, return_id=pr.id, qty=remove_qty)
                         pr.item.add(item)
-                        pr.return_amount = total_return
-                        transaction.vendor.tot_recved -= total_return
+                        pr.return_amount = input_return_amount
+                        # if transaction.received < input_return_amount:
+                        #     messages.warning(request, 'Recieved is less than to be returned!!!')
+                        transaction.vendor.tot_recved -= input_return_amount
                         transaction.vendor.save()
                         cart_id = transaction.order.cart.id
                         c_item = CartItem.objects.get(cart_id=cart_id, item=item)
                         c_item.return_qty -= remove_qty
                         c_item.save()
                         pr.save()
-                        messages.success(request, 'Purchase return successfull!!!')
+                        ReturnTransaction.objects.create(
+                            customer=transaction.customer,
+                            vendor=None,
+                            return_amt=input_return_amount,
+                            type='PURCHASE-RETURN',
+                            purchase_return=pr,
+                            sale_return=None
+                        )
                         data['message'] = 'success'
                 return JsonResponse(data)
         else:
@@ -1514,3 +1591,55 @@ def check_date(request):
     }
     return JsonResponse(data)
 
+
+@login_required()
+def ajax_discount_form(request):
+    if request.method == "POST":
+        form_data = request.POST.dict()
+        order_id = request.POST.get('order_id')
+        order = Order.objects.get(id=order_id)
+
+        keys = []
+        values = []
+        for k, v in form_data.items():
+            if k.__contains__('name'):
+                keys.append(v)
+            elif k.__contains__('value'):
+                values.append(v)
+        del keys[0]
+        del values[0]
+        # if not discount percentage
+        if values[0] == '':
+            disc_per = 0
+            disc_amt = decimal.Decimal(values[1])
+            order.disc_amt = disc_amt
+            order.grand_total = order.get_gt_amt()
+            order.save()
+            data = {
+                'message': 'success',
+                'discAmount': order.disc_amt,
+                'grandTotal': order.grand_total
+            }
+            return JsonResponse(data)
+        # if not discount amount
+        elif values[1] == '':
+            disc_amt = 0
+            disc_per = decimal.Decimal(values[0])
+            print(disc_per)
+            amount = disc_per/100*order.tot_sale_price
+            print(amount)
+            order.disc_amt = amount
+            order.grand_total = order.get_gt_amt()
+            print(order.disc_amt)
+            order.save()
+            data = {
+                'message': 'success',
+                'discAmount': order.disc_amt,
+                'grandTotal': order.grand_total
+            }
+            return JsonResponse(data)
+
+        else:
+            data = {
+                'message': 'invalid'}
+            return JsonResponse(data)

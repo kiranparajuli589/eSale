@@ -12,11 +12,13 @@
                     <h3><i class="pe-7s-cart"></i> Your Cart Details:</h3>
                 </div>
                 <div class="content" style="font-size: large">
-                    Customer: <p class="text-danger" style="font-size: large">{{ order.customer }}</p>
-                    Cart Items: {{ cart_items.count }}<br>
-                    Total Amount Rendered: <p class="text-danger" style="font-size: large">{{ order.tot_buy_price }}</p>
-                    Discount: {{ order.dis_amt }} <br>
-                    Grand Total: <p class="text-danger inline-group" style="font-size: xx-large">{{ order.grand_total }}</p>
+                    {% if order.customer %}
+                        Customer: <p class="text-danger" style="font-size: large">{{ order.customer }}</p>
+                    {% endif %}
+                    Item Types: {{ cart_items.count }}<br>
+                    Gross Total: <p class="text-danger" style="font-size: large">{{ order.tot_sale_price }}</p>
+                    <span style="font-weight: bold">Discount</span>: <span class="text-info">{{ order.disc_amt }}</span> <br>
+                    <p style="font-weight: bold">Net Total: <span class="text-danger inline-group" style="font-size: xx-large">{{ order.grand_total }}</span></p>
                 </div>
             </div>
         </div>

@@ -51,29 +51,20 @@
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="{% url 'inventory' %}" class="simple-text">
+                    <i class="pe-7s-cart"></i>
                     eSale
                 </a>
             </div>
 
             <ul class="nav">
-                <li>
+                <li class="active">
                     <a href="{% url 'inventory' %}">
                         <i class="pe-7s-plugin"></i>
                         <p>Inventory</p>
                     </a>
                 </li>
-                <li>
-                    <a href="{% url 'dashboard' %}">
-                        <i class="pe-7s-graph"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="{% url 'profile' %}">
-                        <i class="pe-7s-user"></i>
-                        <p>User Profile</p>
-                    </a>
-                </li>
+
+
                 <li>
                     <a href="{% url 'customer' %}">
                         <i class="pe-7s-users"></i>
@@ -101,15 +92,22 @@
                 <li>
                     <a href="{% url 'entry' %}">
                         <i class="pe-7s-paper-plane"></i>
-                        <p>Add Entry</p>
+                        <p>Rapid Entry</p>
                     </a>
                 </li>
+
                 <li>
-                    <a href="{% url 'import-export' %}">
-                        <i class="pe-7s-diskette"></i>
-                        <p>Import/Export</p>
+                    <a href="{% url 'profile' %}">
+                        <i class="pe-7s-user"></i>
+                        <p>User Profile</p>
                     </a>
                 </li>
+{#                <li>#}
+{#                    <a href="{% url 'dashboard' %}">#}
+{#                        <i class="pe-7s-graph"></i>#}
+{#                        <p>Dashboard</p>#}
+{#                    </a>#}
+{#                </li>#}
             </ul>
     	</div>
     </div>
