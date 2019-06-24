@@ -297,36 +297,41 @@ def order_transaction(request, pk):
     cart_item = CartItem.objects.filter(cart_id=order.cart.id)
     form = TransactionForm(request.POST)
     if request.method == "POST":
-        print(request.POST)
+
         if form.is_valid():
             received = request.POST.get('received')
             if not order.customer:
                 customer_pk = request.POST.get('customer')
-            # vendor_pk = request.POST.get('vendor')
 
-            if received is '':
-                form.instance.received = 0
-                form.instance.due_amount = order.grand_total
+                try:
+                    customer = Customer.objects.get(id=int(customer_pk))
+                    form.instance.received = decimal.Decimal(received)
+                    form.instance.due_amount = order.grand_total - form.instance.received
+                    print(customer)
+                except:
+                    customer, status = Customer.objects.get_or_create(f_name='Walking', l_name='Customer',
+                                                                      phone=54545454, email='others@xyz.com')
+                    print('others')
+                    form.instance.received = order.grand_total
+                    form.instance.due_amount = 0
+
             else:
-                form.instance.received = decimal.Decimal(received)
-                form.instance.due_amount = order.grand_total - form.instance.received
+                customer = order.customer
+                print(customer)
+                if received is '':
+                    form.instance.received = 0
+                    form.instance.due_amount = order.grand_total
+                else:
+                    form.instance.received = decimal.Decimal(received)
+                    form.instance.due_amount = order.grand_total - form.instance.received
 
             form.instance.type = 'SALE'
-
+            print(customer)
             for ca in cart_item:
                 up_item = Item.objects.get(item_code=ca.item.item_code)
                 up_item.quantity -= ca.cart_qty
                 up_item.save()
             form.instance.order = order
-            if not order.customer:
-                try:
-                    customer = Customer.objects.get(id=int(customer_pk))
-
-                except:
-                    customer, status = Customer.objects.get_or_create(f_name='Walking', l_name='Customer',
-                                                                      phone=54545454, email='others@xyz.com')
-            else:
-                customer = order.customer
 
             customer.tot_due += form.instance.due_amount
             customer.tot_recved += form.instance.received
@@ -350,31 +355,37 @@ def order_transaction_two(request, pk):
     if request.method == "POST":
         if form.is_valid():
             received = request.POST.get('received')
-            # customer_pk = request.POST.get('customer')
+
             if not order.vendor:
                 vendor_pk = request.POST.get('vendor')
                 try:
                     vendor = Vendor.objects.get(id=int(vendor_pk))
+                    form.instance.received = 0
+                    form.instance.due_amount = order.grand_total
                 except:
                     vendor, status = Vendor.objects.get_or_create(f_name='Walking', l_name='Vendor',
                                                                       phone=54545454, email='others@xyz.com')
+                    print('others')
+                    form.instance.received = order.grand_total
+                    form.instance.due_amount = 0
             else:
                 vendor = order.vendor
 
-            if received is '':
-                form.instance.received = 0
-                form.instance.due_amount = order.grand_total
-            else:
-                form.instance.received = decimal.Decimal(received)
-                form.instance.due_amount = order.grand_total - form.instance.received
+                if received is '':
+                    form.instance.received = 0
+                    form.instance.due_amount = order.grand_total
+                else:
+                    form.instance.received = decimal.Decimal(received)
+                    form.instance.due_amount = order.grand_total - form.instance.received
 
+            form.instance.type = 'PURCHASE'
             for ca in cart_item:
                 up_item = Item.objects.get(item_code=ca.item.item_code)
                 up_item.quantity += ca.cart_qty
                 up_item.save()
 
             form.instance.order = order
-            form.instance.type = 'PURCHASE'
+
 
             vendor.tot_due += form.instance.due_amount
             vendor.tot_recved += form.instance.received

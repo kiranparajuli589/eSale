@@ -15,9 +15,16 @@
                 background: #f1f1f1;
                 box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(17, 18, 255, 0.5);
             }
+
+            @media only screen and (max-width: 800px) {
+              input[type='search'] {
+                margin-right: 0;
+              }
+            }
             input[type='search'] {
                 margin: 0;
-                margin-bottom: 20px;
+                margin-bottom: 50px;
+                margin-right:300px;
                 padding: 10px;
                 font-size: 17px;
                 border: 1px solid grey;
@@ -93,7 +100,7 @@
         <script>
             $(document).ready(function(){
 
-                $("#myTable tr:odd").addClass("odd");
+
 
             });
             $(document).ready(function() {

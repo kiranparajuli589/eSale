@@ -1,6 +1,26 @@
 {% extends 'dashboard/inv.html' %}
 {% load crispy_forms_tags %}
 
+
+{% block script %}
+    <script>
+
+        $(document).ready(function () {
+            let c = document.getElementById("id_vendor");
+            let c_id = c.options[c.selectedIndex].value;
+            console.log(c_id);
+            if (c_id === '') {
+                document.getElementById('pamt').style.display = 'none';
+                $('#id_payment_type > option:not(:selected)').attr('disabled', true);
+
+            } else {
+                document.getElementById('pamt').style.display = 'block';
+            }
+        })
+
+    </script>
+{% endblock %}
+
 {% block content %}
     <h3 class="title">Add Transaction Detail</h3>
     <hr style="height: 1px; background-color: #DDDDDD">
@@ -42,7 +62,7 @@
             <br>
             <div class="row" id="pamt">
                 <label class="col-md-5" style="margin-top:3px">Payment Amt</label>
-                <input class="col-md-12" type="number" max="{{ order.grand_total }}" min="{{ 0 }}"
+                <input id='recieve' class="col-md-12" type="number" max="{{ order.grand_total }}" min="{{ 0 }}"
                        name="received" class="form-control" style="width: 13.1em; height: 33px; margin: 13px">
             </div>
         </fieldset>
@@ -56,14 +76,31 @@
 
 
     <script>
-        let e = document.getElementById("id_payment_type");
+       let e = document.getElementById("id_payment_type");
         e.onchange = function(){
             let p_type = e.options[e.selectedIndex].value;
-            if( p_type == 'CREDIT')
+            if( p_type === 'CREDIT')
                 document.getElementById('pamt').style.display = 'none';
             else{
                 document.getElementById('pamt').style.display = 'block';
             }
         };
+        let c = document.getElementById("id_vendor");
+        c.onchange = function () {
+            let c_id = c.options[c.selectedIndex].value;
+            console.log(c_id);
+            if (c_id === '') {
+                console.log('others');
+                $("#recieve").prop('readonly', true);
+                console.log('heyfuck');
+                $("#recieve").prop('required',false);
+                $("#id_payment_type").val("CASH").change();
+                $('#id_payment_type > option:not(:selected)').attr('disabled', true);
+            } else {
+                document.getElementById('pamt').style.display = 'block';
+                $("#recieve").prop('required',true);
+                $('#id_payment_type > option:not(:selected)').attr('disabled', false);
+            }
+        }
     </script>
 {% endblock %}

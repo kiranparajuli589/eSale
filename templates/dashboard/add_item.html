@@ -1,14 +1,37 @@
-{% extends 'dashboard/inv.html' %}
+{% extends 'dashboard/item_active.html' %}
 {% load crispy_forms_tags %}
 
 {% block content %}
 
     <div class="row">
-        <div class="col-md-3"></div>
+        <div class="col-md-1"></div>
         <div class="col-md-5">
-                <h2>Add Item Here</h2><hr size="7">
-                <h3 id="clickMe" style="border-bottom:1px dashed #0a2355">Item import & export</h3>
-                <div class="text-center" id="import" hidden>
+                <h2 style="border-bottom: 2px groove darkslategray; padding-bottom: 10px; margin-bottom: 50px">Add New Item Here</h2>
+
+
+
+                <form method="POST" enctype="multipart/form-data">
+
+
+
+
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+
+                        {{ form|crispy }}
+                    </fieldset>
+
+                    <div class="form-group">
+                        <button name="addItem" class="btn btn-primary" type="submit">Add</button>
+                    </div>
+                </form>
+                <hr style="color:darkred">
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-4">
+            <h3 id="clickMe" style="color: #ffffff;border:1px solid #0a2355; padding:30px; margin-top: 200px; background: radial-gradient(ellipse at top, #e66465, transparent),
+            radial-gradient(ellipse at bottom, #4d9f0c, transparent);" class="text-center">Item import & export</h3>
+                <div class="text-center card" style="padding: 20px" id="import" hidden>
 
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
@@ -35,24 +58,6 @@
                         </form>
 
                 </div>
-
-
-                <form method="POST" enctype="multipart/form-data">
-
-
-
-
-                    {% csrf_token %}
-                    <fieldset class="form-group">
-                        <h3 style="border-bottom:2px solid #0a2355">Item Details</h3>
-                        {{ form|crispy }}
-                    </fieldset>
-
-                    <div class="form-group">
-                        <button name="addItem" class="btn btn-primary" type="submit">Add</button>
-                    </div>
-                </form>
-                <hr style="color:darkred">
         </div>
 
     </div>

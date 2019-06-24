@@ -18,10 +18,10 @@
                             <div class="content" style="font-size: 16px">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h5>
+                                        <p style="font-size: 20px;padding: 0; margin-top: -15px">
                                             Date :
-                                            <span style="font-weight: 400">{{ transac.timestamp }}</span>
-                                        </h5>
+                                            <span style="color:#347826">{{ transac.timestamp }}</span>
+                                        </p>
                                     </div>
 
 
@@ -29,8 +29,9 @@
                                 <div class="col-md-12 text-center text-danger">Transaction Type: {{ transac.type }}</div>
                                 <hr>
                                 {% if not transac.type == 'PAYDUE' %}
-                                    <div class="row">
-                                        <div class=" card col-md-8 col-lg-offset-2 content table-responsive">
+                                    <div class="content row">
+                                        <div class="col-md-2"></div>
+                                        <div class=" card col-md-8 table-responsive">
                                             <table class="table table-hover">
                                                 <thead style="background-color: #cbd5db">
                                                     <th>Item ID</th>
@@ -50,19 +51,28 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <div class="container">
-                                    <div class="row">
+
+                                <div>
+                                    <div class="row text-center">
                                         <div class="col-md-6">
-                                            <h4><i class="fa fa-circle text-info"></i> Recieved:<span><b>{{ transac.received }}</b></span></h4>
+                                            <i class="fa fa-circle text-info"></i>
+                                            <span style="font-size: 24px">
+                                                Recieved: <span class="text-danger">{{ transac.received }}</span>
+                                            </span>
                                         </div>
                                         <div class="col-md-6">
-                                            <h4><i class="fa fa-circle text-danger"></i> Due:<span><b>{{ transac.due_amount }}</b></span></h4>
+                                            <i class="fa fa-circle text-danger"></i>
+                                            <span style="font-size: 24px">
+                                                Due: <span class="text-info">{{ transac.due_amount }}</span>
+                                            </span>
                                         </div>
-
-
                                     </div>
-                                    <hr>
+                                </div>
+                                <hr>
+                                <div class="footer">
+
                                     <div class="stats">
+
                                         <i class="fa fa-check"></i> Data information certified
                                     </div>
                                 </div>

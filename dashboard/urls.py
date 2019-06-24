@@ -74,5 +74,6 @@ urlpatterns = [
     path('ajax/sale/tid/', sale_return_ajax, name='ajax-form-item'),
     path('ajax/purchase/tid/', purchase_return_ajax, name='ajax-purchase-return'),
     path('ajax/check/', check_date, name='ajax-check'),
-    path('ajax/discount/form', ajax_discount_form, name='ajax-discount-form')
+    path('ajax/discount/form', ajax_discount_form, name='ajax-discount-form'),
+    path('ajax/check/other-customer', check_date, name='ajax-check-customer'),
 ]
