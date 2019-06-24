@@ -26,30 +26,39 @@
     <hr style="height: 1px; background-color: #DDDDDD">
 
     <div class="row">
+        <div class="col-md-2"></div>
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="header">
-                    <h3><i class="pe-7s-cart"></i> Your Cart Details:</h3>
+                    <h3 style="border-bottom: 2px solid darkslategray"><i class="pe-7s-cart"></i> Your Cart Details:</h3>
                 </div>
+
+
                 <div class="content" style="font-size: large">
-                    {% if order.vendor %}
-                        Vendor: <p class="text-danger" style="font-size: large">{{ order.vendor }}</p>
+                    {% if order.customer %}
+                        Customer: <p class="text-danger" style="font-size: large">{{ order.vendor }}</p>
                     {% endif %}
-                    Item Types: {{ cart_items.count }}<br>
-                    Gross Total: <p class="text-danger" style="font-size: large">{{ order.tot_buy_price }}</p>
-                    <span style="font-weight: bold">Discount</span>: {{ order.disc_amt }} <br>
+
+                    <p style="font-weight: bold">Item Types: <span class="text-success inline-group" style="font-size: large"> {{ cart_items.count }}</span></p>
+                    <p style="font-weight: bold">Discount: <span class="text-info inline-group" style="font-size: xx-large">{{ order.disc_amt }}</span></p>
+                    <p style="font-weight: bold">Gross Total: <span class="text-primary inline-group" style="font-size: xx-large">{{ order.tot_buy_price }}</span></p>
+
                     <p style="font-weight: bold">Net Total: <span class="text-danger inline-group" style="font-size: xx-large">{{ order.grand_total }}</span></p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <h3>Transaction Detail</h3>
+        <div class="card container col-md-4">
+            <div class="header">
+                <h3 style="border-bottom: 2px solid darkslategray">
+                    <i class="pe-7s-cash"></i>
+                    Transaction Detail</h3>
+            </div>
 
             <form method="POST" enctype="multipart/form-data" class="col-md-4">
         {% csrf_token %}
         <fieldset class="form-group">
              <style>
-                    select {width: 13em; height: 2.5em}
+                    select {width: 17em; height: 3em}
              </style>
             <label style="padding-right: 43px">Payment Type</label>
             {{ form.payment_type }}
@@ -63,7 +72,7 @@
             <div class="row" id="pamt">
                 <label class="col-md-5" style="margin-top:3px">Payment Amt</label>
                 <input id='recieve' class="col-md-12" type="number" max="{{ order.grand_total }}" min="{{ 0 }}"
-                       name="received" class="form-control" style="width: 13.1em; height: 33px; margin: 13px">
+                       name="received" class="form-control" style="width: 17em; height: 37px;  margin-left: 13px;margin-bottom: 5px">
             </div>
         </fieldset>
         <div class="form-group">
@@ -91,8 +100,8 @@
             console.log(c_id);
             if (c_id === '') {
                 console.log('others');
+
                 $("#recieve").prop('readonly', true);
-                console.log('heyfuck');
                 $("#recieve").prop('required',false);
                 $("#id_payment_type").val("CASH").change();
                 $('#id_payment_type > option:not(:selected)').attr('disabled', true);
