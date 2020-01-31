@@ -248,7 +248,7 @@ class ReturnTransaction(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True, blank=True)
     timestamp = models.DateTimeField(default=now)
     return_amt = models.DecimalField(max_digits=8, decimal_places=2, default=0, blank=True)
-    type = models.CharField(max_length=10, choices=return_type, default='SALE-RETURN')
+    type = models.CharField(max_length=15, choices=return_type, default='SALE-RETURN')
     sale_return = models.ForeignKey(SalesReturn, on_delete=models.CASCADE, null=True, blank=True)
     purchase_return = models.ForeignKey(PurchaseReturn, on_delete=models.CASCADE, null=True, blank=True)
 
