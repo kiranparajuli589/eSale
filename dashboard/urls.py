@@ -17,16 +17,9 @@ from .views import (index, inventory,
 router = routers.DefaultRouter()
 router.register(r'items', ItemViewSet)
 
-
-
-
-
-
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
-
     path('db/stat/', index, name='dashboard'),
     path('', inventory, name='inventory'),
     path('item/add/', add_item, name='add-item'),
