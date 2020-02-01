@@ -26,7 +26,7 @@ SECRET_KEY = '5xdpy^0=)pi*q3iqy_22$_1z5wu0ug)0ai3kuj^48l-fm9#&oc'
 DEBUG = True
 
 
-AUTH_USER_MODEL = 'accounts.User'
+# AUTH_USER_MODEL = 'accounts.User'
 
 ALLOWED_HOSTS = ['*']
 
@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'import_export',
-    'corsheaders'
+    'corsheaders',
+    'oauth2_provider'
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # This needs to be first
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
 
 ROOT_URLCONF = 'eSale.urls'
@@ -114,6 +117,25 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
 )
 
+REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    #     'rest_framework.authentication.SessionAuthentication', # To keep the Browsable API
+    # ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+}
+
+# AUTHENTICATION_BACKENDS = (
+#     'django.contrib.auth.backends.ModelBackend' # To keep the Browsable API
+#     'oauth2_provider.backends.OAuth2Backend',
+# )
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
