@@ -1,5 +1,9 @@
 <template>
+<<<<<<< HEAD:eclipse/src/views/DashboardComponent.vue
   <div class="container">
+=======
+  <div class="home">
+>>>>>>> Added navbar component:eclipse/src/views/Home.vue
     <Item/>
   </div>
 </template>
