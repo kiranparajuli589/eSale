@@ -1,13 +1,26 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <Navbar/>
+    <router-link to="/">Home</router-link> |
+    <router-link to="/about">About</router-link>
     <router-view/>
   </div>
 </template>
 
-<style>
+<script>
+  import Navbar from "./components/Navbar"
+  export default {
+    name: 'App',
+    components: {
+      Navbar
+    },
+  }
+</script>
 
+<style>
+  /*universal styles*/
+  a {
+    font-family: "Ubuntu Condensed";
+    color: #4091e2
+  }
 </style>
