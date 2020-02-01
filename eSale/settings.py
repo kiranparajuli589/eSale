@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'import_export',
-    'oauth2_provider',
     'auth_api'
-    'corsheaders'
+    'corsheaders',
+    'oauth2_provider'
 ]
 
 MIDDLEWARE = [
@@ -121,8 +121,8 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-            'rest_framework.permissions.IsAuthenticated',
-        )
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 OAUTH2_PROVIDER = {
