@@ -23,7 +23,7 @@
         },
         methods: {
             getItems() {
-                axios.get("http://127.0.0.1:8000/api/items/")
+                axios.get("http://127.0.0.1:8888/api/items/")
                 .then((res) => {
                     this.items = res.data
                     console.log(this.items)
