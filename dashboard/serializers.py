@@ -6,4 +6,3 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Item
         fields = ('id', 'item_code', 'item_name', 'quantity', 'buying_rate', 'selling_rate')
-
