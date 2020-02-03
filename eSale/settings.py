@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'import_export',
     'auth_api'
     'corsheaders',
-    'oauth2_provider'
+    'oauth2_provider',
+    'auth_api'
 ]
 
 MIDDLEWARE = [

@@ -31,3 +31,4 @@ class GroupList(generics.ListAPIView):
     required_scopes = ['groups']
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
