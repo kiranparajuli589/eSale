@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('', include(router.urls)),
     path('users/', serializers.UserList.as_view()),
-    path('test/', views.getMyUser),
+    path('test/', views.get_my_user),
     path('users/<pk>', serializers.UserDetails.as_view()),
     path('groups/', serializers.GroupList.as_view()),
     path('token/', views.get_token),

@@ -1,5 +1,6 @@
 import os
 import requests
+from django.http import HttpResponse, HttpRequest
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from rest_framework.response import Response
@@ -8,54 +9,63 @@ from rest_framework.decorators import api_view, permission_classes
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
+GET_TOKEN_URL = '{}/o/token/'.format(ESALE_SERVER_BACKEND)
 
-def getMyUser(id):
- resp = get_token()
- print(resp)
-#  headers = {
-#     "Authorization": "Bearer {}".format('')
-#  }
-#  base_url = 'http://0.0.0.0:8000/auth/users/{}'.format(id)
-#  r = requests.get(
-#         base_url,
-#         headers=headers
-#      )
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+def get_my_user(request):
+    token_response = get_token(request)
+    print(token_response)
+    token = token_response['access_token']
+    token_type = token_response['token_type']
+    headers = {'Authorization': '{} {}'.format(token_type, token)}
+
+    with requests.Session() as s:
+        s.headers.update(headers)
+        response = s.get(ESALE_SERVER_BACKEND+'/auth/users')
+
+    return response.json()
+
+
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
 def get_token(request):
-    '''
-    Gets tokens with username and password. Input should be in the format:
-    {"username": "username", "password": "password"}
-    '''
-    r = requests.post(
-    'http://0.0.0.0:8000/o/token/',
-        data={
-            'grant_type': 'password',
-            'username': request.data['username'],
-            'password': request.data['password'],
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
-        },
+    """
+        Gets tokens with username and password. Input should be in the format:
+        {"username": "username", "password": "password"}
+    """
+    data = {
+        'grant_type': 'password',
+        'username': 'admin',
+        'password': 'admin',
+    }
+    auth = (CLIENT_ID, CLIENT_SECRET)
+    # sending get request and saving the response as response object
+    response = requests.post(
+        url=GET_TOKEN_URL,
+        auth=auth,
+        data=data
     )
-    return Response(r.json())
+    # extracting data in json format
+    return response.json()
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def refresh_token(request):
-    '''
+    """
     Registers user to the server. Input should be in the format:
     {"refresh_token": "<token>"}
-    '''
-    r = requests.post(
-    'http://0.0.0.0:8000/o/token/',
-        data={
+    """
+    data = {
             'grant_type': 'refresh_token',
-            'refresh_token': request.data['refresh_token'],
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
-        },
+            'username': 'admin',
+            'password': 'password',
+        }
+    # auth = (CLIENT_ID, CLIENT_SECRET)
+
+    r = requests.post(
+        GET_TOKEN_URL,
+        auth=auth,
+        data=data
     )
     return Response(r.json())
 
@@ -68,7 +78,7 @@ def revoke_token(request):
     {"token": "<token>"}
     '''
     r = requests.post(
-        'http://0.0.0.0:8000/o/revoke_token/',
+        '{}/o/revoke_token/'.format(ESALE_SERVER_BACKEND),
         data={
             'token': request.data['token'],
             'client_id': CLIENT_ID,
