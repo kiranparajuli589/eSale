@@ -26,8 +26,6 @@ SECRET_KEY = '5xdpy^0=)pi*q3iqy_22$_1z5wu0ug)0ai3kuj^48l-fm9#&oc'
 DEBUG = True
 
 
-# AUTH_USER_MODEL = 'accounts.User'
-
 ALLOWED_HOSTS = ['*']
 
 
@@ -46,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'corsheaders',
-    'oauth2_provider'
+    'oauth2_provider',
+    'auth_api'
 ]
 
 MIDDLEWARE = [
@@ -118,24 +117,18 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-    #     'rest_framework.authentication.SessionAuthentication', # To keep the Browsable API
-    # ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated',
+        )
 }
 
 OAUTH2_PROVIDER = {
     # this is the list of available scopes
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
 }
-
-# AUTHENTICATION_BACKENDS = (
-#     'django.contrib.auth.backends.ModelBackend' # To keep the Browsable API
-#     'oauth2_provider.backends.OAuth2Backend',
-# )
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
