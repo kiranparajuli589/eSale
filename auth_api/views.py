@@ -1,11 +1,7 @@
 import os
 import requests
-from django.http import HttpResponse, HttpRequest
-from rest_framework import viewsets
-from django.contrib.auth.models import User
+from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view, permission_classes
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
@@ -18,7 +14,7 @@ last_token_response = {}
 def get_present_token():
     global last_token
     if not last_token:
-        get_new_token()
+        admin_get_new_token()
     return last_token
 
 
@@ -42,21 +38,12 @@ def get_authorization_header():
     return {'Authorization': '{} {}'.format('Bearer', token)}
 
 
-def get_all_users():
-    headers = get_authorization_header()
-
-    with requests.Session() as s:
-        s.headers.update(headers)
-        response = s.get(ESALE_SERVER_BACKEND+'/auth/users')
-
-    return response.json()
-
-
-def get_new_token():
+def admin_get_new_token():
     """
         Gets tokens with username and password. Input should be in the format:
         {"username": "username", "password": "password"}
     """
+
     data = {
         'grant_type': 'password',
         'username': 'admin',
@@ -126,3 +113,24 @@ def revoke_token(request):
         return Response({'message': 'token revoked'}, response.status_code)
     # Return the error if it goes badly
     return Response(response.json(), response.status_code)
+
+
+def get_all_users(request):
+    headers = get_authorization_header()
+    with requests.Session() as s:
+        s.headers.update(headers)
+        response = s.get(ESALE_SERVER_BACKEND+'/auth/users')
+    json_response = response.json()
+    return JsonResponse(json_response, safe=False)
+
+
+def get_a_user(request, user_id):
+    headers = get_authorization_header()
+    print('here')
+    print(headers)
+    with requests.Session() as s:
+        s.headers.update(headers)
+        response = s.get(ESALE_SERVER_BACKEND + '/auth/users/' + user_id + '/`+1*9')
+    # json_response = response.json()
+    print(response)
+    # return JsonResponse(json_response, safe=False)
