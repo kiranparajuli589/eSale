@@ -12,6 +12,10 @@ last_token_response = {}
 
 
 def get_present_token():
+    """
+    returns present working token
+    :return: (str)
+    """
     global last_token
     if not last_token:
         admin_get_new_token()
@@ -19,21 +23,38 @@ def get_present_token():
 
 
 def set_token(token):
+    """
+    sets token as present working token
+    :param token: (str)
+    :return (void)
+    """
     global last_token
     last_token = token
 
 
 def set_last_token_response(token_response):
+    """
+    sets lasts token response to global var
+    :param token_response: (dict)
+    :return (dict)
+    """
     global last_token_response
     last_token_response = token_response
 
 
 def get_last_token_response():
+    """
+    return last token response
+    :return: (dict)
+    """
     global last_token_response
     return last_token_response
 
 
 def get_authorization_header():
+    """
+    :return: (dict)
+    """
     token = get_present_token()
     return {'Authorization': '{} {}'.format('Bearer', token)}
 
@@ -41,7 +62,7 @@ def get_authorization_header():
 def admin_get_new_token():
     """
         Gets tokens with username and password. Input should be in the format:
-        {"username": "username", "password": "password"}
+        :return (void)
     """
 
     data = {
@@ -66,6 +87,7 @@ def refresh_token():
     """
     Registers user to the server. Input should be in the format:
     {"refresh_token": "<token>"}
+    :return (void)
     """
     token_response = get_last_token_response()
     data = {
@@ -90,8 +112,9 @@ def refresh_token():
 
 def revoke_token(request):
     """
-    Method to revoke tokens.
+    Method to revoke/officially un-register tokens.
     {"token": "<token>"}
+    :return (void)
     """
     data = {
             'token': get_present_token(),
@@ -116,6 +139,13 @@ def revoke_token(request):
 
 
 def get_all_users(request):
+    """
+    returns json response of all created users
+    Args:
+         request (object)
+    Returns:
+         dict: json response of get request
+    """
     headers = get_authorization_header()
     with requests.Session() as s:
         s.headers.update(headers)
@@ -125,12 +155,19 @@ def get_all_users(request):
 
 
 def get_a_user(request, user_id):
+    """
+    returns user with given user_id
+    Args:
+        request (object)
+        user_id: (str) user id of expected user
+    Returns:
+        dict: JsonResponse of get request
+    """
     headers = get_authorization_header()
     print('here')
     print(headers)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.get(ESALE_SERVER_BACKEND + '/auth/users/' + user_id + '/`+1*9')
-    # json_response = response.json()
-    print(response)
-    # return JsonResponse(json_response, safe=False)
+    json_response = response.json()
+    return JsonResponse(json_response, safe=False)
