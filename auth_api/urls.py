@@ -11,7 +11,7 @@ urlpatterns = [
     path('test/', views.get_all_users),
     path('test/<user_id>', views.get_a_user),
     path('groups/', serializers.GroupList.as_view()),
-    path('token/', views.admin_get_new_token),
+    path('token/new', views.admin_get_new_token),
     path('token/refresh/', views.refresh_token),
     path('token/revoke/', views.revoke_token),
 ]

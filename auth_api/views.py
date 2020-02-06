@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 from django.http import JsonResponse
@@ -11,14 +12,14 @@ last_token = ""
 last_token_response = {}
 
 
-def get_present_token():
+def get_present_token(request):
     """
     returns present working token
     :return: (str)
     """
     global last_token
     if not last_token:
-        admin_get_new_token()
+        admin_get_new_token(request)
     return last_token
 
 
@@ -51,15 +52,15 @@ def get_last_token_response():
     return last_token_response
 
 
-def get_authorization_header():
+def get_authorization_header(request):
     """
     :return: (dict)
     """
-    token = get_present_token()
+    token = get_present_token(request)
     return {'Authorization': '{} {}'.format('Bearer', token)}
 
 
-def admin_get_new_token():
+def admin_get_new_token(request):
     """
         Gets tokens with username and password. Input should be in the format:
         :return (void)
@@ -81,9 +82,10 @@ def admin_get_new_token():
     json_response = response.json()
     set_token(json_response['access_token'])
     set_last_token_response(json_response)
+    return JsonResponse(json_response)
 
 
-def refresh_token():
+def refresh_token(request):
     """
     Registers user to the server. Input should be in the format:
     {"refresh_token": "<token>"}
@@ -98,7 +100,7 @@ def refresh_token():
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET
         }
-    headers = get_authorization_header()
+    headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.post(
@@ -117,11 +119,11 @@ def revoke_token(request):
     :return (void)
     """
     data = {
-            'token': get_present_token(),
+            'token': get_present_token(request),
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
         }
-    headers = get_authorization_header()
+    headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.post(
@@ -146,7 +148,7 @@ def get_all_users(request):
     Returns:
          dict: json response of get request
     """
-    headers = get_authorization_header()
+    headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.get(ESALE_SERVER_BACKEND+'/auth/users')
@@ -163,11 +165,14 @@ def get_a_user(request, user_id):
     Returns:
         dict: JsonResponse of get request
     """
-    headers = get_authorization_header()
-    print('here')
-    print(headers)
-    with requests.Session() as s:
-        s.headers.update(headers)
-        response = s.get(ESALE_SERVER_BACKEND + '/auth/users/' + user_id + '/`+1*9')
-    json_response = response.json()
-    return JsonResponse(json_response, safe=False)
+    all_users = get_all_users(request)
+    all_users = json.loads(all_users.content)
+    found = False
+    expected_user = {}
+    for user in all_users:
+        print(user)
+        if user["id"] == user_id:
+            found = True
+            expected_user = user
+            break
+    return JsonResponse(expected_user, safe=False)
