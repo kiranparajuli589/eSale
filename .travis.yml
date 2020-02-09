@@ -19,7 +19,8 @@ install:
   - python manage.py makemigrations
   - python manage.py migrate
   - python manage.py createsuperuser --no-input
-  - python manage.py runserver $ESALE_SERVER_BACKEND
+  - python manage.py runserver $ESALE_SERVER_BACKEND &
+  - until curl -s $ESALE_SERVER_BACKEND; do sleep 5; done
 
 script:
   - behave tests/features/token.feature
