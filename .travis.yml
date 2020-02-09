@@ -26,6 +26,10 @@ script:
   - behave tests/features/token.feature
   - behave tests/features/ninja.feature
 
+script:
+  - behave tests/features/token.feature
+  - behave tests/features/ninja.feature
+
 cache:
   - pip
 
