@@ -8,6 +8,9 @@ env:
   - ESALE_SERVER_BACKEND: "127.0.0.1:8888"
     CLIENT_ID: "Jd5h7NrgqnckhvnhBp826VQdwtUFuHw7li89QZex"
     CLIENT_SECRET: "f7JjxGzEc45mBM6EpfmaxNQlYH4eMNOITcSjXyFG5EefcIHYcByMeSd77QUMNeoNwUy0wSnf3ucRbVAcahSINMZHWxlVV3kdW2d0gsmiPoQLszm4h5LnppsgqXyotQd"
+    DJANGO_SUPERUSER_PASSWORD: admin
+    DJANGO_SUPERUSER_USERNAME: admin
+    DJANGO_SUPERUSER_EMAIL: admin@test.com
 
 install:
   - pip install -r requirements.txt
@@ -15,6 +18,7 @@ install:
   - python manage.py migrate
   - python manage.py makemigrations
   - python manage.py migrate
+  - python manage.py createsuperuser --no-input
   - python manage.py runserver $ESALE_SERVER_BACKEND
 
 script:
