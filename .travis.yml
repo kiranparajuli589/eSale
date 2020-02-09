@@ -1,0 +1,19 @@
+dist: bionic
+language: python
+
+python:
+  - 3.7
+  - 3.8
+
+install:
+  - pip install -r requirements.txt
+  - python manage.py makemigrations auth_api
+  - python manage.py migrate
+  - python manage.py makemigrations
+  - python manage.py migrate
+  - python manage.py runserver 127.0.0.1:8888
+
+cache:
+  - pip
+  - npm
+
