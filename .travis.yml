@@ -17,6 +17,10 @@ install:
   - python manage.py migrate
   - python manage.py runserver $ESALE_SERVER_BACKEND
 
+script:
+  - behave tests/features/token.feature
+  - behave tests/features/ninja.feature
+
 cache:
   - pip
 
