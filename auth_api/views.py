@@ -1,9 +1,11 @@
-import json
 import os
+import json
 import requests
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from rest_framework.response import Response
+from django.conf import settings
+
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
@@ -81,6 +83,7 @@ def admin_get_new_token(request):
     )
     # extracting data in json format
     json_response = response.json()
+    print(json_response)
     set_token(json_response['access_token'])
     set_last_token_response(json_response)
     return JsonResponse(json_response)

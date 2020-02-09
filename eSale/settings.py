@@ -29,6 +29,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
+GET_TOKEN_URL = '{}/o/token/'.format(ESALE_SERVER_BACKEND)
+LAST_TOKEN = ""
+LAST_TOKEN_RESPONSE = {}
+
+
 # Application definition
 
 INSTALLED_APPS = [
