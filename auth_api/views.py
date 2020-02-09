@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from rest_framework.response import Response
 
@@ -170,9 +171,24 @@ def get_a_user(request, user_id):
     found = False
     expected_user = {}
     for user in all_users:
-        print(user)
         if user["id"] == user_id:
             found = True
             expected_user = user
             break
-    return JsonResponse(expected_user, safe=False)
+    if not expected_user:
+        raise Exception("Expected: <user>, Found: no user with provided id: {}".format(user_id))
+    return JsonResponse(json.dumps(expected_user), safe=False)
+
+
+def authenticate_user(username, password):
+    """
+    Args:
+        username(str): username
+        password(str): password
+    Returns:
+       JsonResponse
+    """
+    test_user = authenticate(username=username, password=password)
+    print(test_user)
+    print(type(test_user))
+    return JsonResponse(test_user, safe=False)
