@@ -1,3 +1,4 @@
+import sure
 from behave import given, when, then
 from hamcrest import assert_that, equal_to, is_not
 

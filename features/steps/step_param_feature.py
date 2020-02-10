@@ -1,3 +1,4 @@
+import sure
 from behave import given, when, then
 from features.main.Blender import Blender
 from features.main.Frobulator import Frobulator
@@ -64,7 +65,8 @@ def step_impl(context, count, department):
 
 @then('we will find one person in "{department}"')
 def step_impl(context, department):
-    (1).should.equal(context.model.get_headcount_for(department))
+    # assert_that(1, (context.model.get_headcount_for(department)))
+    (1).should.be.equal(context.model.get_headcount_for(department))
 
 
 @then('we will have the following people in "{department}"')
