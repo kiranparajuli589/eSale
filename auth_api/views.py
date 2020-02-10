@@ -1,4 +1,3 @@
-import os
 import json
 import requests
 from django.contrib.auth import authenticate
@@ -7,23 +6,14 @@ from rest_framework.response import Response
 from django.conf import settings
 
 
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
-GET_TOKEN_URL = '{}/o/token/'.format(ESALE_SERVER_BACKEND)
-last_token = ""
-last_token_response = {}
-
-
 def get_present_token(request):
     """
     returns present working token
     :return: (str)
     """
-    global last_token
-    if not last_token:
+    if not settings.LAST_TOKEN:
         admin_get_new_token(request)
-    return last_token
+    return settings.LAST_TOKEN
 
 
 def set_token(token):
@@ -32,8 +22,7 @@ def set_token(token):
     :param token: (str)
     :return (void)
     """
-    global last_token
-    last_token = token
+    settings.LAST_TOKEN = token
 
 
 def set_last_token_response(token_response):
@@ -42,8 +31,7 @@ def set_last_token_response(token_response):
     :param token_response: (dict)
     :return (dict)
     """
-    global last_token_response
-    last_token_response = token_response
+    settings.LAST_TOKEN_RESPONSE = token_response
 
 
 def get_last_token_response():
@@ -51,8 +39,7 @@ def get_last_token_response():
     return last token response
     :return: (dict)
     """
-    global last_token_response
-    return last_token_response
+    return settings.LAST_TOKEN_RESPONSE
 
 
 def get_authorization_header(request):
@@ -74,16 +61,15 @@ def admin_get_new_token(request):
         'username': 'admin',
         'password': 'admin',
     }
-    auth = (CLIENT_ID, CLIENT_SECRET)
+    auth = (settings.CLIENT_ID, settings.CLIENT_SECRET)
     # sending get request and saving the response as response object
     response = requests.post(
-        url=GET_TOKEN_URL,
+        url=settings.GET_TOKEN_URL,
         auth=auth,
         data=data
     )
     # extracting data in json format
     json_response = response.json()
-    print(json_response)
     set_token(json_response['access_token'])
     set_last_token_response(json_response)
     return JsonResponse(json_response)
@@ -101,14 +87,14 @@ def refresh_token(request):
             'refresh_token': token_response['refresh_token'],
             'username': 'admin',
             'password': 'password',
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET
+            'client_id': settings.CLIENT_ID,
+            'client_secret': settings.CLIENT_SECRET
         }
     headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.post(
-            url=GET_TOKEN_URL,
+            url=settings.GET_TOKEN_URL,
             data=data
         )
     json_response = response.json()
@@ -124,14 +110,14 @@ def revoke_token(request):
     """
     data = {
             'token': get_present_token(request),
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
+            'client_id': settings.CLIENT_ID,
+            'client_secret': settings.CLIENT_SECRET,
         }
     headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
         response = s.post(
-            url='{}/o/revoke_token'.format(ESALE_SERVER_BACKEND),
+            url='{}/o/revoke_token'.format(settings.ESALE_SERVER_BACKEND),
             data=data
         )
     json_response = response.json()
@@ -155,7 +141,7 @@ def get_all_users(request):
     headers = get_authorization_header(request)
     with requests.Session() as s:
         s.headers.update(headers)
-        response = s.get(ESALE_SERVER_BACKEND+'/auth/users')
+        response = s.get(settings.ESALE_SERVER_BACKEND+'/auth/users')
     json_response = response.json()
     return JsonResponse(json_response, safe=False)
 
@@ -192,6 +178,4 @@ def authenticate_user(username, password):
        JsonResponse
     """
     test_user = authenticate(username=username, password=password)
-    print(test_user)
-    print(type(test_user))
     return JsonResponse(test_user, safe=False)
