@@ -1,8 +1,7 @@
-import sure
 from behave import given, when, then
 from hamcrest import assert_that, equal_to, is_not
 
-from tests.features.main.NinjaFight import NinjaFight
+from features.main.NinjaFight import NinjaFight
 
 
 @given('the ninja has a {achievement_level}')

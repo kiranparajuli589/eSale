@@ -1,9 +1,8 @@
-import sure
 from behave import given, when, then
-from tests.features.main.Blender import Blender
-from tests.features.main.Frobulator import Frobulator
-from tests.features.main.company_model import CompanyModel
-from tests.features.main.test_util import NamedNumber
+from features.main.Blender import Blender
+from features.main.Frobulator import Frobulator
+from features.main.company_model import CompanyModel
+from features.main.test_util import NamedNumber
 from hamcrest import assert_that, has_items
 from hamcrest.library.collection.issequence_containinginanyorder \
     import contains_inanyorder

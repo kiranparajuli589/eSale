@@ -23,8 +23,9 @@ install:
   - until curl -s $ESALE_SERVER_BACKEND; do sleep 5; done
 
 script:
-  - behave tests/features/token.feature
-  - behave tests/features/ninja.feature
+  - behave features/token.feature
+  - behave features/ninja.feature
+  - behave features/apiUserRetrieve.feature
 
 cache:
   - pip
