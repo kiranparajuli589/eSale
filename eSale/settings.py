@@ -35,6 +35,9 @@ ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
 GET_TOKEN_URL = '{}/o/token/'.format(ESALE_SERVER_BACKEND)
 LAST_TOKEN = ""
 LAST_TOKEN_RESPONSE = {}
+LAST_STD_OUT = {}
+LAST_ERR_RESP = {}
+LAST_STATUS_CODE = int
 
 
 # Application definition
