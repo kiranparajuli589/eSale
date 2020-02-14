@@ -1,5 +1,6 @@
 import requests
 import sure
+from django.contrib.auth.models import User
 from requests import request
 from django.conf import settings
 from behave import given, when, then

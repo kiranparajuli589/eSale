@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'import_export',
     'corsheaders',
     'oauth2_provider',
-    'auth_api'
+    'auth_api',
+    'behave_django',
 ]
 
 MIDDLEWARE = [
