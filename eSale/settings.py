@@ -26,7 +26,7 @@ SECRET_KEY = '5xdpy^0=)pi*q3iqy_22$_1z5wu0ug)0ai3kuj^48l-fm9#&oc'
 DEBUG = True
 
 
-AUTH_USER_MODEL = 'accounts.User'
+# AUTH_USER_MODEL = 'accounts.User'
 
 ALLOWED_HOSTS = ['*']
 
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'import_export',
-    'corsheaders'
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
