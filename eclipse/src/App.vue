@@ -30,7 +30,6 @@
     font-family: "Ubuntu Condensed";
     color: #4091e2
   }
-<<<<<<< HEAD
   .page-title {
     color: #1b8db8;
     padding-top: 20px;
@@ -45,6 +44,4 @@
     margin-left: auto;
     margin-right: auto;
   }
-=======
->>>>>>> Added navbar component
 </style>
