@@ -22,10 +22,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '-jz37yba@+l@ae16&hp-!!c568)e&!280^n%1=pduxsc(0wld#'
 
+# Load operating system environment variables and then prepare to use them
+env = os.environ
+
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
+# DEBUG = env.bool('DJANGO_DEBUG', False)
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Application definition
@@ -37,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'accounts',
 
     'rest_framework',
 ]
