@@ -1,0 +1,101 @@
+{% extends 'dashboard/ven.html' %}
+
+{% block script %}
+    <script>
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+
+        $(document).on('click', '#clickMe', function () {
+            $("#import").slideToggle()
+        })
+    </script>
+{% endblock %}
+
+{% block content %}
+    {% include "dashboard/search_bar.html" %}
+    <br><hr>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-3 text-center text-capitalize"><h2>Vendor Panel</h2></div>
+            <div class="col-sm-5">
+                <h4 class="text-center" id="clickMe">Import Vendor</h4>
+                <div class="text-center" id="import" hidden>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                          <div class="file-field">
+                            <div class="btn BTN-FILE btn-sm float-left text-center" >
+                              <span>Choose file</span>
+                              <input required class="text-center" type="file" name="myFile" id="file"
+                                     style="
+                                        font-size: 17px; margin-left: 80px;
+                                        color: #ff4a55;">
+                            </div>
+                          </div>
+                        <br>
+                          <div class="form-group text-center">
+                                <button name="vendorSubmit" type="submit" class="btn btn-primary btn-sm" style="font-size: 20px; padding-right: 17px">
+                                    <i class="pe-7s-upload" style="font-size: 26px"></i>
+                                    Upload
+                                </button>
+                              <a href="{% url 'export-vendor' %}" class="btn btn-danger btn-sm" style="font-size: 20px; padding-right: 17px">
+                                    <i class="pe-7s-download" style="font-size: 26px"></i>
+                                    Export
+                              </a>
+                          </div>
+                    </form>
+
+              </div>
+            </div>
+            <div class="col-sm-2 col-lg-offset-1"  style="padding-top: 25px; padding-left: 140px">
+                <a href="{% url 'add-vendor' %}" class="btn btn-danger"><i class="pe-7s-plus text-primary"></i> Add Vendor</a>
+            </div>
+        </div>
+        <div class="content table-responsive table-full-width">
+            <table class="table">
+                <thead style="background-color: #6396e8; color: whitesmoke;">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Vendor</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Email</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Address</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Phone</td>
+{#                    <td style="font-family: 'Noto Sans CJK SC Bold'"></td>#}
+                </thead>
+                <tbody id="myTable">
+                    <style>
+                        .odd {
+                            background-color: #cdddf7; }
+
+                        .odd td {
+                            border-bottom: 1px solid #cef; }
+                    </style>
+                    {% for vendor in vendors %}
+                        <tr>
+                            <td>{{ vendor.id }}</td>
+                            <td>
+                                <a href="{% url 'vendor-detail' vendor.id %}">
+                                    {{ vendor.get_vendor_name }}
+                                </a>
+                            </td>
+                            <td>{{ vendor.email }}</td>
+                            <td>{{ vendor.address }}</td>
+                            <td>{{ vendor.phone }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("tr:odd").addClass("odd");
+
+        });
+    </script>
+{% endblock %}

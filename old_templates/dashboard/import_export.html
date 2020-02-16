@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        .BTN-FILE:hover {
+            background-color: transparent;
+            color: #07420a;
+            border-color: #013a02;
+        }
+    </style>
+  <h3 class="text-center">Item import & export</h3>
+    <br>
+    {% if prompt %}
+    <div class="text-center text-danger">
+      {{ prompt.order }}
+    </div>
+  {% endif %}
+    <br>
+  <div class="text-center">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+          <div class="file-field">
+            <div class="btn BTN-FILE btn-sm float-left text-center" >
+              <span>Choose file</span>
+              <input required class="text-center" type="file" name="myFile" id="file"
+                     style="
+                        font-size: 17px; margin-left: 80px;
+                        color: #ff4a55;">
+            </div>
+          </div>
+        <br>
+          <div class="form-group text-center">
+                <button name="itemSubmit" type="submit" class="btn btn-primary btn-lg" style="font-size: 22px; padding-right:40px;">
+                    <i class="pe-7s-upload" style="font-size: 26px"></i>
+                    Upload
+                </button>
+              <a href="{% url 'export_items_csv' %}" class="btn btn-danger btn-lg" style="font-size: 22px; padding-right:40px;">
+                    <i class="pe-7s-download" style="font-size: 26px"></i>
+                    Export
+              </a>
+          </div>
+    </form>
+      <hr style="color:darkred">
+
+  </div>
+{% endblock %}

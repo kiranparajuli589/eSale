@@ -1,0 +1,57 @@
+{% extends 'dashboard/inv.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="card">
+        <form role="form" method="POST">
+            {% csrf_token %}
+            <br>
+            <div class="header">
+                <h3 class="title">Your Cart</h3>
+            </div>
+            <div class="content">
+                <div class="content table-responsive table-full-width">
+                    <table class="table table-hover table-striped">
+                        <thead style="background-color: #afd9ee">
+                            <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                            <td style="font-family: 'Noto Sans CJK SC Bold'">Item</td>
+                            <td style="font-family: 'Noto Sans CJK SC Bold'">Buying Rate</td>
+                            <td style="font-family: 'Noto Sans CJK SC Bold'">Selling Rate</td>
+                            <td style="font-family: 'Noto Sans CJK SC Bold'">Available Quantity</td>
+                            <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Cart Quantity</td>
+                        </thead>
+                        <tbody>
+                            {% for sel in selecs %}
+                                <tr>
+                                    <td>{{ sel.item_code }}</td>
+                                    <td>{{ sel.item_name }}</td>
+                                    <td>{{ sel.buying_rate }}</td>
+                                    <td>{{ sel.selling_rate }}</td>
+                                    <td class="text-center">{{ sel.quantity }}</td>
+                                    <td class="text-center">
+                                        <div class="form-group">
+                                            <div class="col-md-7 col-sm-offset-3">
+                                                <input type="number" name= "cart_qty" max="{{ sel.quantity }}"
+                                                       min="{{ 1 }}" style="width: 9em" required>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="footer">
+                {# # TODO place modal close button #}
+                <div class="legend" style="padding-left: 20px; padding-bottom: 15px">
+                    <button type="submit" class="btn btn-primary" name="sale">SALE</button>
+                    <button type="submit" class="btn btn-danger" name="purchase">PURCHASE</button>
+                </div>
+                <hr>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>Inventory</title>
+    {% endif %}
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+    <meta name="viewport" content="width=device-width" />
+
+
+    <!-- Bootstrap core CSS     -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+
+    <!-- Animation library for notifications   -->
+    <link href="{% static 'css/animate.min.css' %}" rel="stylesheet"/>
+
+    <!--  Light Bootstrap Table core CSS    -->
+
+    <link href="{% static 'css/light-bootstrap-dashboard.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/checkbox.css' %}" rel="stylesheet"/>
+
+
+
+
+
+    <!--  CSS for Demo Purpose, don't include it in your project     -->
+{#    <link href="assets/css/demo.css" rel="stylesheet" />#}
+
+
+    <!--     Fonts and icons     -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+    <link href="{% static 'css/pe-icon-7-stroke.css' %}" rel="stylesheet" />
+{#    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">#}
+
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="sidebar" data-color="purple" data-image="{% static 'img/sidebar-5.jpg' %}">
+
+    <!--
+        Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
+        Tip 2: you can also add an image using data-image tag
+    -->
+
+    	<div class="sidebar-wrapper">
+            <div class="logo">
+                <a href="{% url 'inventory' %}" class="simple-text">
+                    <i class="pe-7s-cart"></i>
+                    eSale
+                </a>
+            </div>
+
+            <ul class="nav">
+                <li class="active">
+                    <a href="{% url 'inventory' %}">
+                        <i class="pe-7s-plugin"></i>
+                        <p>Inventory</p>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{% url 'customer' %}">
+                        <i class="pe-7s-users"></i>
+                        <p>Customer</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'vendor' %}">
+                        <i class="pe-7s-smile"></i>
+                        <p>Vendor</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'transaction-tab' %}">
+                        <i class="pe-7s-cash"></i>
+                        <p>Transactions</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'add-item' %}">
+                        <i class="pe-7s-plus"></i>
+                        <p>Add Item</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'entry' %}">
+                        <i class="pe-7s-paper-plane"></i>
+                        <p>Rapid Entry</p>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'profile' %}">
+                        <i class="pe-7s-user"></i>
+                        <p>User Profile</p>
+                    </a>
+                </li>
+{#                <li>#}
+{#                    <a href="{% url 'dashboard' %}">#}
+{#                        <i class="pe-7s-graph"></i>#}
+{#                        <p>Dashboard</p>#}
+{#                    </a>#}
+{#                </li>#}
+            </ul>
+    	</div>
+    </div>
+
+    <div class="main-panel">
+        <nav class="navbar navbar-ct-red navbar-fixed" style="background-color: #4b1e7a;">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">INVENTORY</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-left">
+
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                           <a href="{% url 'profile' %}">
+                               <p style="color: #ffffff">{{ user.f_name }}</p>
+                           </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <p style="color: #ffffff">Logout</p>
+                            </a>
+                        </li>
+						<li class="separator hidden-lg"></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% block content %}
+
+                        {% endblock %}
+                </div>
+            </div>
+        </div>
+
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <nav class="pull-left">
+                    <ul>
+                        <li>
+                            <a href="#">
+                                Home
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <p class="copyright pull-right">
+                    &copy; <script>document.write(new Date().getFullYear())</script> <a href="https://www.linkedin.com/in/%C4%B7i%C5%99%C3%A2n-p%C3%A0%C5%99%C3%A1j%C5%B1li-6a0063141/">Kiran</a>, made with love for a better web
+                </p>
+            </div>
+        </footer>
+
+    </div>
+</div>
+
+
+</body>
+
+    <!--   Core JS Files   -->
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+	<script src="{% static 'js/bootstrap.min.js' %}" type="text/javascript"></script>
+
+
+    <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
+	<script src="{% static 'js/light-bootstrap-dashboard.js' %}"></script>
+
+    {% block script %}
+    {% endblock %}
+{#    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>#}
+
+</html>

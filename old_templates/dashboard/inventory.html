@@ -1,0 +1,61 @@
+{% extends 'dashboard/inv.html' %}
+
+{% block content %}
+
+
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <h2 style="margin-left:15px; margin-top: -10px; border-bottom: 2px solid #3b0a77">Store Item List</h2>
+
+            <button type="submit"
+                    style="margin-right: 20px;"
+                    class="btn btn-primary pull-right">
+                <i class="pe-7s-cart"></i> To Cart
+            </button>
+
+        </div>
+        <br>
+        <div class="table-responsive table-full-width" id="checkedTable">
+            <h3><i class="pe-7s-cart" style="font-size: xx-large"></i>Selected Item List:</h3>
+            <table class="table">
+                <thead style="background-color: #2f3a4b; color: whitesmoke;">
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Item Name</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Purchase Rate</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Sale Rate</td>
+                    <td class="text-center" style="font-family: 'Noto Sans CJK SC Bold'">Add to Cart</td>
+                </thead>
+                <tbody id="checkedTableBody"></tbody>
+            </table>
+        </div>
+        <div class="table-responsive table-full-width" style="margin: 1px; padding: 2px">
+
+            {% include 'dashboard/item_table.html' %}
+        </div>
+    </form>
+
+    <script>
+
+        $("#checkedTable").hide();
+        $(document).on('click', 'input[type="checkbox"]', function () {
+            if ($(this).prop('checked') === true) {
+                console.log('check');
+                $(this).parent().parent().parent().prependTo("#checkedTableBody");
+            }
+            if ($(this).prop("checked") === false) {
+                console.log('uncheck');
+                $(this).parent().parent().parent().prependTo("#myTable");
+            };
+            let i= $("form input[type='checkbox']:checked").length;
+            if (i>0) {
+                $("#checkedTable").show();
+            }
+            else {
+                $("#checkedTable").hide();
+            }
+        })
+    </script>
+{% endblock %}

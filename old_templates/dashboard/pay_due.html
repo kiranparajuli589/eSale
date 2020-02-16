@@ -1,0 +1,13 @@
+{% extends 'dashboard/cus.html' %}
+
+{% block content %}
+    <div class="col-lg-offset-4">
+        <h3>DUE PAYMENT</h3>
+        <p>Enter amount: </p>
+        <form method="POST" class="form-inline">
+            {% csrf_token %}
+            <input type="number" min="0" class="form-control" name="PAYDUE" max="{{ customer.tot_due }}">
+            <button class="btn btn-primary btn-round btn-fill" type="submit">PAY</button>
+        </form>
+    </div>
+{% endblock %}

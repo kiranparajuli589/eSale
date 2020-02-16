@@ -1,0 +1,106 @@
+{% extends 'dashboard/tran.html' %}
+{% load static %}
+
+{% block script %}
+    <script>
+        function myFunction() {
+          // Declare variables
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    {% include 'dashboard/search_bar.html' %}
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        <h3 class="text-center">Transactions Log</h3><br>
+        <div class="content table-responsive table-full-width">
+            <table class="table" id="myTable">
+                <thead style="background-color: #6396e8; color: whitesmoke;">                    <td style="font-family: 'Noto Sans CJK SC Bold'">Order ID</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Actor</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Type</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Quantity</td>
+{#                    <th>Buy Price</th>#}
+{#                    <th>Sale Price</th>#}
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Payment Amount</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">Due</td>
+                    <td style="font-family: 'Noto Sans CJK SC Bold'">DateTime</td>
+
+                </thead>
+                <tbody>
+                    <style>
+                        .odd {
+                            background-color: #cdddf7; }
+
+                        .odd td {
+                            border-bottom: 1px solid #cef; }
+                    </style>
+                    {% for trans in transacs %}
+                        <tr>
+                            <td>
+                                {% if trans.order.id %}
+
+                                        {{ trans.order.id }}
+{#                                    </a>#}
+                                {% else %}
+                                    0{{ trans.id }}
+                                {% endif %}
+                            </td>
+                            <td class="text-primary">
+                                <a href="{% url 'transaction_detail' trans.id %}">
+                                    {% if trans.customer.get_customer_name %}
+                                            {{ trans.customer.get_customer_name }}
+                                    {% elif trans.vendor.get_vendor_name %}
+                                            {{ trans.vendor.get_vendor_name }}
+{#                                    {% else %}#}
+{#                                        <a href="{% url 'transaction_detail' trans.id %}">#}
+{#                                            Others#}
+{#                                        </a>#}
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td>{{ trans.type }}</td>
+                            <td>
+                                {% if trans.order.cart.quantity %}
+                                    {{ trans.order.cart.quantity }}
+                                {% else %}
+                                    {{ 0 }}
+                                {% endif %}
+                            </td>
+{#                            <td>{{ trans.order.tot_buy_price }}</td>#}
+{#                            <td>{{ trans.order.tot_sale_price }}</td>#}
+                            <td>{{ trans.received }}</td>
+                            <td>{{ trans.due_amount }}</td>
+                            <td>{{ trans.timestamp|date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("tr:odd").addClass("odd");
+        });
+    </script>
+{% endblock %}
