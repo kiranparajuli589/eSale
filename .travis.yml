@@ -15,7 +15,7 @@ env:
 install:
   - cd backend/
   - pip install -r requirements.txt
-  - python manage.py makemigrations auth_api
+  - python manage.py makemigrations accounts
   - python manage.py migrate
   - python manage.py makemigrations
   - python manage.py migrate
