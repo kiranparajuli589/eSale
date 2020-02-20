@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
                   'gender', 'date_of_birth', 'is_customer', 'is_vendor',
+                  'is_superuser', 'is_staff', 'date_of_birth', 'date_joined',
                   'phone', 'user_profile',
                   )
 
@@ -27,11 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserSerializerCreate(serializers.ModelSerializer):
 
     class Meta:
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name',
-                  'password', 'gender', 'date_of_birth', 'is_customer',
-                  'phone', 'is_vendor',
-                  )
+        fields = ('username', 'password')
 
     # def validate(self, data):
     #     """
@@ -94,3 +91,4 @@ class UserProfileSerializerUpdate(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('profile_photo', 'photo_doc')
+        model = User

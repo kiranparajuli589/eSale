@@ -1,14 +1,15 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework import status, viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
 from ..models import UserProfile, User, UserActivationCode
+from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
 from ..serializers import (
     UserSerializer,
     UserSerializerCreate,
@@ -17,24 +18,22 @@ from ..serializers import (
 )
 
 
-# users
-class UserView(APIView):
+class UsersViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
 
-    @staticmethod
-    def get(request):
-        """
-        List users
-        """
+    Additionally we also provide an extra `highlight` action.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = [OAuth2Authentication]
 
-        users = User.objects.all()
-        return Response(UserSerializer(users, many=True).data)
-
-    @staticmethod
-    def post(request):
+    @action(detail=False, methods=["post"])
+    def post(self, request):
         """
         Create user
         """
-
         serializer = UserSerializerCreate(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
@@ -60,26 +59,22 @@ class UserView(APIView):
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# users/{user_id}
-class UserDetail(APIView):
-
-    @staticmethod
-    def get(request, user_id):
+    @action(detail=True, methods=['get'])
+    def get(self, request, pk=None):
         """
         View individual user
         """
 
-        user = get_object_or_404(User, pk=user_id)
+        user = get_object_or_404(User, pk=pk)
         return Response(UserSerializer(user).data)
 
-    @staticmethod
-    def patch(request, user_id):
+    @action(detail=True, methods=['patch'])
+    def patch(self, request, pk=None):
         """
         Update authenticated user
         """
 
-        user = get_object_or_404(User, pk=user_id)
+        user = get_object_or_404(User, pk=pk)
         if user != request.user:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         serializer = UserSerializerUpdate(user, data=request.data, context={'request': request}, partial=True)
@@ -88,13 +83,13 @@ class UserDetail(APIView):
             return Response(UserSerializerLogin(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @staticmethod
-    def delete(request, user_id):
+    @action(detail=True, methods=['delete'])
+    def delete(self, request, pk=None):
         """
         Delete user
         """
 
-        user = get_object_or_404(User, pk=user_id)
+        user = get_object_or_404(User, pk=pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

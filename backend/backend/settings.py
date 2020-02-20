@@ -83,7 +83,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-# rest_framework_social_oauth2
+#               rest_framework_social_oauth2
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
             ],
