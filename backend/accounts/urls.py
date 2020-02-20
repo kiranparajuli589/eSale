@@ -26,7 +26,7 @@ urlpatterns = [
 
 
     # Users
-    url(r'^users/$', UserView.as_view()),
-    url(r'^users/(?P<user_id>[\d]+)$', UserDetail.as_view()),
-    url(r'^users/verify-token/$', verify_token),
+    url(r'^$', UserView.as_view()),
+    url(r'^(?P<user_id>[\d]+)$', UserDetail.as_view()),
+    url(r'^verify-token/$', verify_token),
 ]
