@@ -23,7 +23,7 @@ module.exports = {
     test_settings: {
         default: {
           selenium_host: SELENIUM_HOST,
-          launch_url: LOCAL_LAUNCH_URL,
+          launch_url: "https://www.google.com",
           globals: {
             waitForConditionTimeout: 20000,
             waitForConditionPollInterval: 10,
