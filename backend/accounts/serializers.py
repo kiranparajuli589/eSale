@@ -1,7 +1,7 @@
-from django.contrib.auth.password_validation import validate_password
+from .models import UserProfile, User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from .models import UserProfile, User
+from django.contrib.auth.password_validation import validate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,21 +30,11 @@ class UserSerializerCreate(serializers.ModelSerializer):
     class Meta:
         fields = ('username', 'password')
 
-    # def validate(self, data):
-    #     """
-    #     Administrator permissions needed
-    #     """
-
-    #     if not is_administrator(self.context['request'].user):
-    #         raise serializers.ValidationError(constants.PERMISSION_ADMINISTRATOR_REQUIRED)
-    #     return data
-
     @staticmethod
     def validate_password(password):
         """
         Validate password
         """
-
         validate_password(password)
         return password
 
@@ -69,16 +59,6 @@ class UserSerializerLogin(UserSerializer):
                   )
 
 
-class UserSerializerUpdate(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'gender',
-                  'date_of_birth', 'phone', 'is_vendor',
-                  'is_customer', 'email', 'is_staff', 'is_active',
-                  )
-
-
 class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -91,4 +71,3 @@ class UserProfileSerializerUpdate(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('profile_photo', 'photo_doc')
-        model = User
