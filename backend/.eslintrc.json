@@ -1,0 +1,18 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "amd": true
+    },
+    "extends": [
+        "standard",
+        ],
+    },
+    "rules": {
+      "require-await": "warn",
+    },
+    "globals": {
+      "require": false,
+      "requirejs": false
+    }
+}
