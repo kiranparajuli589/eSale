@@ -1,50 +1,66 @@
 const fetch = require('node-fetch')
 const {client} = require('nightwatch-api')
+let lastResponse = {}
+let lastMetaResponse = {}
 
 
 module.exports = {
     CLIENT_ID: process.env.CLIENT_ID,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     accessToken: process.env.ACCESS_TOKEN,
+    setLastResponse: async (response) => {
+      lastResponse = await response.json()
+    },
+    getLastResponse: () => {
+      return lastResponse
+    },
+    setLastResponseMeta: async (metaResponse) => {
+        lastMetaResponse = metaResponse
+    },
+    getLastResponseMeta: () => {
+      return lastMetaResponse
+    },
     getOauthHeader: function () {
         return {
             Authorization: "Bearer " + this.accessToken,
-            ContentTypes: "application/json",
-            Accept: "application/json",
-            // ContentEncoding: "utf-8"
         }
     },
     httpGetRequest: async function (apiUrl, pk = null) {
         let url = pk === null ? apiUrl : apiUrl + pk + '/'
         const headers = this.getOauthHeader()
-        const response = await fetch(
-             url,
-            {
-                  method: 'GET',
-                  headers: headers
-            })
-        if (!(response.status === 200)) {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        })
+        if (!(response["status"] === 200)) {
             throw new Error("Expected response to be success, but got:\n" +
-                "status: " + response.status + '\n' +
-                "error: " + response.statusText
+                "status: " + response["status"] + '\n' +
+                "error: " + response["statusText"] + '\n' +
+                "Full Response: " + response
             )
         }
-        return await response.json()
+        this.setLastResponseMeta({
+            url: response["url"],
+            status: response["status"],
+            statusText: response["statusText"],
+            headers: response["headers"],
+        })
+        await this.setLastResponse(response)
     },
     httpPostRequest: async function (url, body) {
         let headers
         headers = this.getOauthHeader()
         const response = await fetch(
-             url,
+            url,
             {
                 method: 'POST',
                 headers: headers,
-                body: body,
+                body: {"username": "kirantestni", "password": "kiran"},
             })
-        if (!(response.status === 200)) {
+        if (!(response["status"] === 200)) {
             throw new Error("Expected response to be success, but got:\n" +
-                "status: " + response.status + '\n' +
-                "error: " + response.statusText
+                "status: " + response["status"] + '\n' +
+                "error: " + response["statusText"]
             )
         }
         return await JSON.parse(response)
