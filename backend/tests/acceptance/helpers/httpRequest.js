@@ -1,33 +1,60 @@
 const fetch = require('node-fetch')
 const {client} = require('nightwatch-api')
+const axios = require('axios');
 let lastResponse = {}
 let lastMetaResponse = {}
+let accessToken = ""
 
 
 module.exports = {
-    CLIENT_ID: process.env.CLIENT_ID,
-    CLIENT_SECRET: process.env.CLIENT_SECRET,
-    accessToken: process.env.ACCESS_TOKEN,
     setLastResponse: async (response) => {
-      lastResponse = await response.json()
+        lastResponse = await response.json()
     },
     getLastResponse: () => {
-      return lastResponse
+        return lastResponse
     },
-    setLastResponseMeta: async (metaResponse) => {
+    setLastResponseMeta: function (metaResponse) {
         lastMetaResponse = metaResponse
     },
     getLastResponseMeta: () => {
-      return lastMetaResponse
+        return lastMetaResponse
     },
-    getOauthHeader: function () {
+    getNewAccessToken: async function () {
+        const url = "http://127.0.0.1:8888/auth/token"
+        const response = await axios.post(url,
+                                "client_id=" + process.env.CLIENT_ID + '&' +
+                    "client_secret=" + process.env.CLIENT_SECRET + '&' +
+                    "grant_type=password" + '&' +
+                    "username=admin" + '&' +
+                    "password=admin"
+        )
+        console.log(response)
+        accessToken = response["data"]["access_token"]
+    },
+    getAccessToken: async function () {
+        if (accessToken === '')
+            await this.getNewAccessToken()
+        return accessToken
+    },
+    getOauthHeader: async function () {
+        accessToken = await this.getAccessToken()
         return {
-            Authorization: "Bearer " + this.accessToken,
+            Authorization: "Bearer " + accessToken,
         }
+    },
+    setResponse: async function (response) {
+        const metaResponse = {
+            url: response["url"],
+            status: response["status"],
+            statusText: response["statusText"],
+            headers: response["headers"],
+        }
+        this.setLastResponseMeta(metaResponse)
+        await this.setLastResponse(response)
     },
     httpGetRequest: async function (apiUrl, pk = null) {
         let url = pk === null ? apiUrl : apiUrl + pk + '/'
-        const headers = this.getOauthHeader()
+        const headers = await this.getOauthHeader()
         const response = await fetch(url, {
             method: 'GET',
             headers: headers
@@ -39,13 +66,7 @@ module.exports = {
                 "Full Response: " + response
             )
         }
-        this.setLastResponseMeta({
-            url: response["url"],
-            status: response["status"],
-            statusText: response["statusText"],
-            headers: response["headers"],
-        })
-        await this.setLastResponse(response)
+        await this.setResponse(response)
     },
     httpPostRequest: async function (url, body) {
         let headers
@@ -55,7 +76,7 @@ module.exports = {
             {
                 method: 'POST',
                 headers: headers,
-                body: {"username": "kirantestni", "password": "kiran"},
+                body: body,
             })
         if (!(response["status"] === 200)) {
             throw new Error("Expected response to be success, but got:\n" +
@@ -63,6 +84,6 @@ module.exports = {
                 "error: " + response["statusText"]
             )
         }
-        return await JSON.parse(response)
+        await this.setResponse(response)
     },
 }

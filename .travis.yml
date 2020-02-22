@@ -2,18 +2,37 @@ dist: bionic
 language: python
 
 python:
-  - 3.8
+  - 3.7
+
+node_js:
+  - 10.15.2
+
+node:
+  - 13.5.0
+
+addons:
+  chrome: stable
+
+sudo:
+  true
 
 env:
-  - ESALE_SERVER_BACKEND: "127.0.0.1:8888"
-    CLIENT_ID: "Jd5h7NrgqnckhvnhBp826VQdwtUFuHw7li89QZex"
-    CLIENT_SECRET: "f7JjxGzEc45mBM6EpfmaxNQlYH4eMNOITcSjXyFG5EefcIHYcByMeSd77QUMNeoNwUy0wSnf3ucRbVAcahSINMZHWxlVV3kdW2d0gsmiPoQLszm4h5LnppsgqXyotQd"
+  - ESALE_SERVER_BACKEND: 127.0.0.1:8888
+    CLIENT_ID: "QDnggmItR8jYiwrqSHzoeHbC0pM4dxUgBR44z4Bj"
+    CLIENT_SECRET: "wuTb6ztWsxNAOVaizUxhTjqpR3ZXJYwoq5qhvm7LtWhhJP7iOilBFkpDdIrUA2TcQ40LkOod145OilEEp1tAaTP5i08b9yq3Yup9IfiV8Tp0sr5dJTnUppPPsgNiOUpv"
     DJANGO_SUPERUSER_USERNAME: admin
     DJANGO_SUPERUSER_PASSWORD: admin
     DJANGO_SUPERUSER_EMAIL: admin@test.com
+    SELENIUM_HOST: 127.0.0.1
 
 install:
   - cd backend/
+  - sudo apt-get update -y
+  - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+  - source ~/.profile
+  - source ~/.bashrc
+  - nvm install v13.5.0
+  - nvm use v13.5.0
   - pip install -r requirements.txt
   - yarn install-all
   - yarn selenium
@@ -26,9 +45,11 @@ install:
   - until curl -s $ESALE_SERVER_BACKEND; do sleep 5; done
 
 script:
+  - nodejs -v
+  - node -v
   - yarn acceptance-tests tests/acceptance/features/apiUsers/createUsers.feature
 
 
 cache:
   - pip
-
+  - yarn

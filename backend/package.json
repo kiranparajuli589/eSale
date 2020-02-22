@@ -3,7 +3,7 @@
   "scripts": {
     "clean-all": "rimraf node_modules",
     "upgrade-all": "yarn upgrade",
-    "install-all": "yarn install --frozen-lockfile",
+    "install-all": "yarn install",
     "lint": "eslint tests --ext js --color",
     "lint-fix": "eslint tests --ext js --color --fix",
     "install": "cd node_modules/cucumber; yarn install --frozen-lockfile",
@@ -11,6 +11,7 @@
     "selenium": "docker run --rm -d -p 127.0.0.1:${SELENIUM_PORT:-4444}:4444 -p 5900:5900 --name selenium selenium/standalone-chrome-debug"
   },
   "devDependencies": {
+    "axios": "^0.19.2",
     "chromedriver": "^80.0.1",
     "cucumber": "^6.0.5",
     "cucumber-pretty": "^6.0.0",
