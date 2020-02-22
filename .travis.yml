@@ -15,6 +15,8 @@ env:
 install:
   - cd backend/
   - pip install -r requirements.txt
+  - yarn install-all
+  - yarn selenium
   - python manage.py makemigrations accounts
   - python manage.py migrate
   - python manage.py makemigrations
@@ -24,8 +26,8 @@ install:
   - until curl -s $ESALE_SERVER_BACKEND; do sleep 5; done
 
 script:
-#  - behave tests/features/token.feature
-#  - behave tests/features/ninja.feature
+  - yarn acceptance-tests tests/acceptance/features/apiUsers/createUsers.feature
+
 
 cache:
   - pip
