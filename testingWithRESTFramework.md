@@ -69,7 +69,7 @@ client.post('/notes/', {'title': 'new idea'}, format='json')
 ```
 
 ##### Authenticating
-- .login(**kwargs)
+###### .login(**kwargs)
 Then `login` method functions exactly as it does with Django's regular `Client` class. This allows you to authenticate requests
 against any views which include `SessionAuthentication`
 ```python
@@ -82,7 +82,7 @@ client.logout()
 ```
 The `login` method is appropriate for testing APIs that use session authentication, for example websites which include AJAX
 interaction with the API.
-- .credentials(,,kwargs)
+###### .credentials(,,kwargs)
 The `credentials` method can be used to set headers that will then be included on all subsequent requests by the test client.
 ```python
 from rest_framework.authtoken.models import Token
