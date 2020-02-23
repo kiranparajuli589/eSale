@@ -1,8 +1,7 @@
 from ..models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
+from rest_framework.authentication import TokenAuthentication
 from ..serializers import (
     UserSerializer,
 )
@@ -14,6 +13,6 @@ class UsersViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    authentication_classes = [OAuth2Authentication, SessionAuthentication, BasicAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
 

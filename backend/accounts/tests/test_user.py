@@ -1,9 +1,7 @@
 import os
 import requests
+from ..TokenHelper import TokenHelper
 from django.contrib.auth import authenticate
-from OAuth2Helper import OAuth2Helper
-from django.conf import settings
-settings.configure()
 from rest_framework.test import APIClient, APITestCase
 
 
@@ -21,21 +19,18 @@ def authenticate_user(username, password):
 
 
 class UserTest(APITestCase):
-    def __init__(self):
-        super().__init__()
+    def setUp(self):
         self.client = APIClient()
-        self.OAuth2Helper = OAuth2Helper()
+        self.OAuth2Helper = TokenHelper()
         self.__ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
 
-    def get_all_users(self, request):
+    def test_get_all_users(self):
         """
         returns json response of all created users
-        Args:
-             request (object)
         Returns:
              dict: json response of get request
         """
-        headers = OAuth2Helper.get_authorization_header(self.OAuth2Helper, request)
+        headers = TokenHelper.get_authorization_header(self.OAuth2Helper)
         with requests.Session() as s:
             s.headers.update(headers)
             response = s.get(self.__ESALE_SERVER_BACKEND + '/api/v1/users/')
@@ -44,19 +39,16 @@ class UserTest(APITestCase):
             200
         )
 
-    def get_a_user(self, request, user_id):
+    def test_get_a_user(self):
         """
         returns user with given user_id
-        Args:
-            request (object)
-            user_id: (str) user id of expected user
         Returns:
             dict: JsonResponse of get request
         """
-        headers = OAuth2Helper.get_authorization_header(self.OAuth2Helper, request)
+        headers = TokenHelper.get_authorization_header(self.OAuth2Helper)
         with requests.Session() as s:
             s.headers.update(headers)
-            response = s.get('{}/api/v1/users/{}/'.format(self.__ESALE_SERVER_BACKEND, user_id))
+            response = s.get('{}/api/v1/users/1/'.format(self.__ESALE_SERVER_BACKEND))
         self.assertEqual(
             response.status_code,
             200

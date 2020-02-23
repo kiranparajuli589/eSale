@@ -50,9 +50,7 @@ INSTALLED_APPS = [
     'accounts',
 
     'rest_framework',
-    'oauth2_provider',
-    'social_django',
-    'rest_framework_social_oauth2',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -125,10 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
-        'rest_framework_social_oauth2.authentication.SocialAuthentication',
-
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -138,7 +133,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-   'rest_framework_social_oauth2.backends.DjangoOAuth2',
+   # 'rest_framework_social_oauth2.backends.DjangoOAuth2',
    'django.contrib.auth.backends.ModelBackend',
 )
 
