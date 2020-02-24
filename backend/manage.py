@@ -5,8 +5,12 @@ import sys
 
 
 def main():
+    """
+    :return:
+    """
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
     try:
+        # pylint: disable=C0415
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
