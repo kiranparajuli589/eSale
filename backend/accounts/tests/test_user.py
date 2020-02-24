@@ -1,8 +1,11 @@
+"""
+Users API Test
+"""
 import os
 import requests
-from ..TokenHelper import TokenHelper
-from django.contrib.auth import authenticate
 from rest_framework.test import APIClient, APITestCase
+from django.contrib.auth import authenticate
+from ..token_helper import TokenHelper
 
 
 def authenticate_user(username, password):
@@ -14,15 +17,21 @@ def authenticate_user(username, password):
        JsonResponse
     """
     test_user = authenticate(username=username, password=password)
-    print(test_user)
     print(type(test_user))
 
 
 class UserTest(APITestCase):
+    """
+    User API Test Class
+    """
+
     def setUp(self):
+        """
+        :return: void
+        """
         self.client = APIClient()
-        self.OAuth2Helper = TokenHelper()
-        self.__ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
+        self.token_helper = TokenHelper()
+        self.__esale_server_backend = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
 
     def test_get_all_users(self):
         """
@@ -30,10 +39,12 @@ class UserTest(APITestCase):
         Returns:
              dict: json response of get request
         """
-        headers = TokenHelper.get_authorization_header(self.OAuth2Helper)
-        with requests.Session() as s:
-            s.headers.update(headers)
-            response = s.get(self.__ESALE_SERVER_BACKEND + '/api/v1/users/')
+        headers = TokenHelper.get_authorization_header(self.token_helper)
+        print(self.__esale_server_backend)
+        with requests.Session() as session:
+            session.headers.update(headers)
+            response = session.get(self.__esale_server_backend + '/api/v1/users/')
+        print(response)
         self.assertEqual(
             response.status_code,
             200
@@ -45,10 +56,10 @@ class UserTest(APITestCase):
         Returns:
             dict: JsonResponse of get request
         """
-        headers = TokenHelper.get_authorization_header(self.OAuth2Helper)
-        with requests.Session() as s:
-            s.headers.update(headers)
-            response = s.get('{}/api/v1/users/1/'.format(self.__ESALE_SERVER_BACKEND))
+        headers = TokenHelper.get_authorization_header(self.token_helper)
+        with requests.Session() as session:
+            session.headers.update(headers)
+            response = session.get('{}/api/v1/users/1/'.format(self.__esale_server_backend))
         self.assertEqual(
             response.status_code,
             200

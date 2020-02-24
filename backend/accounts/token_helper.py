@@ -1,14 +1,20 @@
+"""
+Token Helper
+"""
 import os
 import re
 import requests
 
 
 class TokenHelper:
+    """
+    Token Helper Class
+    """
     def __init__(self):
-        self.__ESALE_SERVER_BACKEND = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
-        self.__LAST_TOKEN = ""
-        self.__ADMIN_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME')
-        self.__ADMIN_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD')
+        self.__esale_server_backend = 'http://' + os.getenv('ESALE_SERVER_BACKEND')
+        self.__last_token = ""
+        self.__admin_username = os.getenv('DJANGO_SUPERUSER_USERNAME')
+        self.__admin_password = os.getenv('DJANGO_SUPERUSER_PASSWORD')
 
     def __set_token(self, token):
         """
@@ -16,16 +22,16 @@ class TokenHelper:
         :param token: (str)
         :return (void)
         """
-        self.__LAST_TOKEN = token
+        self.__last_token = token
 
     def get_present_token(self):
         """
         returns present working token
         :return: (str)
         """
-        if not self.__LAST_TOKEN:
+        if not self.__last_token:
             self.admin_get_new_token()
-        return self.__LAST_TOKEN
+        return self.__last_token
 
     def get_authorization_header(self):
         """
@@ -40,11 +46,11 @@ class TokenHelper:
             :return (void)
         """
         data = {
-            'username': self.__ADMIN_USERNAME,
-            'password': self.__ADMIN_PASSWORD
+            'username': self.__admin_username,
+            'password': self.__admin_password
         }
         response = requests.post(
-            url='{}/token/'.format(self.__ESALE_SERVER_BACKEND),
+            url='{}/token/'.format(self.__esale_server_backend),
             data=data
         )
         token_response = response.content.decode("ASCII")

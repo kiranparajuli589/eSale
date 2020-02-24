@@ -22,6 +22,7 @@ install:
   - until curl -s $ESALE_SERVER_BACKEND; do sleep 5; done
 
 script:
+  - pylint -j 3 accounts backend manage.py
   - python manage.py test accounts.tests
 
 cache:

@@ -1,9 +1,15 @@
+"""
+Account Model Admin
+"""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import UserProfile, ResetPasswordCode, User, UserActivationCode
 
 
 class MyUserAdmin(UserAdmin):
+    """
+    Shapes UserModel in Django Admin
+    """
     list_display = ('username', 'email', 'date_joined', 'is_superuser')
     list_filter = ('is_superuser', 'is_customer')
 
