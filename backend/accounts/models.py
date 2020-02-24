@@ -17,7 +17,7 @@ def upload_posts_media_to(instance, filename):
     :param filename: media
     :return: string
     """
-    username = instance.user.email
+    username = instance.user.username
     _, file_extension = os.path.splitext(filename)
     filename = str(random.getrandbits(64)) + file_extension
     return f'photos/{username}/{filename}'
@@ -134,8 +134,6 @@ class UserProfile(models.Model):
     User Profile Model
     """
     profile_photo = models.ImageField(
-        null=True, upload_to=upload_posts_media_to, default=None)
-    photo_doc = models.ImageField(
         null=True, upload_to=upload_posts_media_to, default=None)
     is_verified = models.BooleanField(default=False)
     pending_verification = models.BooleanField(default=False)
